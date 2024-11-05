@@ -1,23 +1,22 @@
 package com.dat3.jpgroentbackend.controllers;
 
+import com.dat3.jpgroentbackend.controllers.dto.request.CreatePlantTypeRequest;
 import com.dat3.jpgroentbackend.model.PlantType;
 import com.dat3.jpgroentbackend.model.repositories.PlantTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Arrays;
 
 @RestController
 @Tag(name = "PlantType")
@@ -31,19 +30,19 @@ public class PlantTypeController{
             summary = "Create new PlantType"
     )
     public PlantType createPlantType(
-            @RequestParam String name,
-            @RequestParam @Parameter(description = "The number of days it takes for the plant to pre-germinate") @Min(0) int preGerminationDays,
-            @RequestParam @Parameter(description = "The number of days it takes for the plant to be ready to harvest") @Min(0) int growthTimeDays,
-            @RequestParam PlantType.PreferredPosition preferredPosition,
-            @Parameter(description = "An list of days after the creation date, where the plant should be watered", example = "[1,5,7]") @RequestParam int[] wateringSchedule
-            ) {
-
+            @Valid
+            @RequestBody CreatePlantTypeRequest request
+    ) {
         //Check if name i not already used
-        if(plantTypeRepository.existsById(name)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + name + "' already exists"); //IdAlreadyExistInDB(name);
+        if(plantTypeRepository.existsById(request.name)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
         }
 
-        PlantType plantType = new PlantType(name, preGerminationDays, growthTimeDays, preferredPosition, wateringSchedule);
+        //Validate logic
+        if(request.growthTimeDays < request.preGerminationDays) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Growth time must be equal to or larger than germination time");
+        if(request.growthTimeDays < Arrays.stream(request.wateringSchedule).max().orElse(0)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It's not possible to have a watering schedule date higher than the growth time");
+
+        PlantType plantType = new PlantType(request.name, request.preGerminationDays, request.growthTimeDays, request.preferredPosition, request.wateringSchedule);
         return plantTypeRepository.save(plantType);
     }
 

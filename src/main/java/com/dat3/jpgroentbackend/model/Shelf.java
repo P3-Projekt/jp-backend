@@ -2,6 +2,8 @@ package com.dat3.jpgroentbackend.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Shelf {
     @Id
@@ -12,8 +14,14 @@ public class Shelf {
     @JoinColumn(name = "rack_id")
     public Rack rack;
 
+    @OneToMany(mappedBy = "shelf")
+    public List<BatchLocation> batchLocations;
+
+    public int position;
+
     public Shelf(){}
-    public Shelf(Rack rack) {
+    public Shelf(Rack rack, int position) {
         this.rack = rack;
+        this.position = position;
     }
 }

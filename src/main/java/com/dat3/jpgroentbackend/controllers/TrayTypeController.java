@@ -1,5 +1,6 @@
 package com.dat3.jpgroentbackend.controllers;
 
+import com.dat3.jpgroentbackend.controllers.dto.request.CreateTrayTypeRequest;
 import com.dat3.jpgroentbackend.model.TrayType;
 import com.dat3.jpgroentbackend.model.repositories.TrayTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,14 +10,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-//import javax.validation.constraints.Min;
 
 @RestController
 @Tag(name = "TrayType")
@@ -30,32 +29,32 @@ public class TrayTypeController {
             summary = "Create new TrayType"
     )
     public TrayType CreateTrayType(
-            @RequestParam String name,
-            @RequestParam @Min(0) int widthCm,
-            @RequestParam @Min(0) int lengthCm
+            @Valid
+            @RequestBody CreateTrayTypeRequest request
     ) {
 
         //Disallow creating tray type with already existing name
-        if(trayTypeRepository.existsById(name)) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + name + "' already exists"); //IdAlreadyExistInDB(name);
+        if(trayTypeRepository.existsById(request.name)) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
 
-        TrayType trayType = new TrayType(name, widthCm, lengthCm);
+        TrayType trayType = new TrayType(request.name, request.widthCm, request.lengthCm);
 
         return trayTypeRepository.save(trayType);
     }
 
-    @DeleteMapping("TrayType")
+    @DeleteMapping("TrayType/{trayTypeId}")
     @Operation(
-            summary = "Delete a tray"
+            summary = "Delete a TrayType"
     )
     public void DeleteTrayType(
-            @RequestParam String name
+            @PathVariable String trayTypeId
     ){
-        trayTypeRepository.deleteById(name);
+        if (!trayTypeRepository.existsById(trayTypeId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A TrayType with id '" + trayTypeId + "' does not exist");
+        trayTypeRepository.deleteById(trayTypeId);
     }
 
     @GetMapping("/TrayTypes")
     @Operation(
-            summary = "List of all trays",
+            summary = "List all TrayTypes",
             responses = {
                     @ApiResponse(content = {@Content(array = @ArraySchema(schema = @Schema(implementation = TrayType.class)))})
             }

@@ -2,6 +2,7 @@ package com.dat3.jpgroentbackend.controllers.dto;
 
 import com.dat3.jpgroentbackend.model.Rack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RackDto {
@@ -13,6 +14,11 @@ public class RackDto {
         this.id = rack.id;
         this.xCoordinate = rack.xCoordinate;
         this.yCoordinate = rack.yCoordinate;
-        this.shelves = rack.shelves.stream().map(ShelfDto::new).toList();
+        if(rack.shelves != null) {
+            this.shelves = rack.shelves.stream().map(ShelfDto::new).toList();
+        } else {
+            this.shelves = new ArrayList<>();
+        }
+
     }
 }

@@ -3,7 +3,7 @@ package com.dat3.jpgroentbackend.controllers.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class CreateTrayType {
+public class CreateTrayTypeRequest {
     @NotNull
     public String name;
 
