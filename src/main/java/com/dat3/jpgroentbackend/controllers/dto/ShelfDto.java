@@ -13,10 +13,10 @@ public class ShelfDto {
     public List<BatchLocationDto> batchLocations;
 
     public ShelfDto(Shelf shelf) {
-        this.shelfId = shelf.id;
-        this.rackId = shelf.rack.id;
-        this.position = shelf.position;
+        this.shelfId = shelf.getId();
+        this.rackId = shelf.getRack().getId();
+        this.position = shelf.getPosition();
 
-        this.batchLocations = shelf.batchLocations.stream().map(BatchLocationDto::new).toList();
+        this.batchLocations = shelf.getBatchLocations().stream().map(BatchLocationDto::new).toList();
     }
 }

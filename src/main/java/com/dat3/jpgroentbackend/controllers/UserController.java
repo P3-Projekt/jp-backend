@@ -36,6 +36,7 @@ public class UserController {
             User user = new User(request.name, request.role);
             return userRepository.save(user);
     }
+
     @GetMapping("/Users")
     @Operation(
             summary = "List all Users",
@@ -45,5 +46,17 @@ public class UserController {
     )
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @DeleteMapping("/Users/{name}")
+    @Operation(
+            summary = "Set a user inactive"
+    )
+    public void setUserInactive(
+            @PathVariable String name
+    ) {
+        User user = userRepository.findByNameAndActive(name, true).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+        user.setInactive();
+        userRepository.save(user);
     }
 }

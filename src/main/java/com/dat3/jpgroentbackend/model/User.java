@@ -13,12 +13,29 @@ public class User {
     }
 
     @Id
-    public String name;
-    public Role role;
+    private String name;
+    private Role role;
+    private boolean active = true;
 
     public User(){}
     public User(String name, Role role){
         this.name = name;
         this.role = role;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setInactive() {
+        active = false;
     }
 }

@@ -13,9 +13,9 @@ public class BatchDto {
 
     public BatchDto(Batch batch) {
         this.batchId = batch.id;
-        this.plantTypeId = batch.plantType.name;
-        this.trayTypeId = batch.trayType.name;
+        this.plantTypeId = batch.plantType.getName();
+        this.trayTypeId = batch.trayType.getName();
         this.createdAt = batch.createdAt.toString();
-        this.createdBy = batch.createdBy.name;
+        this.createdBy = batch.createdBy.getName();
     }
 }

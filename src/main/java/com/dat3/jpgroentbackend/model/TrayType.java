@@ -8,11 +8,11 @@ import jakarta.persistence.Id;
 public class TrayType {
 
     @Id
-    public String name;
+    private String name;
 
-    public int lengthCm;
+    private int lengthCm;
 
-    public int widthCm;
+    private int widthCm;
 
     public TrayType(String name, int lengthCm, int widthCm) {
         this.name = name;
@@ -21,4 +21,16 @@ public class TrayType {
     }
 
     public TrayType() {}
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLengthCm() {
+        return lengthCm;
+    }
+
+    public int getWidthCm() {
+        return widthCm;
+    }
 }
