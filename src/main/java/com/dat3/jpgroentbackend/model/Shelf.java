@@ -24,4 +24,16 @@ public class Shelf {
         this.rack = rack;
         this.position = position;
     }
+
+    public List<BatchLocation> getBatchLocations() {
+        return batchLocations;
+    }
+
+    public void addBatchLocation(BatchLocation batchLocation) {
+        batchLocations.add(batchLocation);
+    }
+
+    public void removeBatchLocation(BatchLocation batchLocation) {
+        batchLocations.remove(batchLocation);
+    }
 }

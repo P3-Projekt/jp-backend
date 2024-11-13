@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Tag(name = "Rack")
@@ -101,7 +102,7 @@ public class RackController{
     ){
         Rack rack = rackRepository.findById(rackId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No rack with id " + rackId + " was found"));
         List<List<Batch>> batches = new ArrayList<>();
-        for (Shelf shelf : rack.shelves){
+        for (Shelf shelf : rack.getShelves()){
             List<BatchLocation> batchLocations = batchLocationRepository.findByShelf(shelf);
             List<Batch> batchesOnShelf = batchLocations.stream().map((location) -> location.batch).toList();
             batches.add(batchesOnShelf);
@@ -109,4 +110,44 @@ public class RackController{
         return batches;
     }
 
+    @DeleteMapping("/Rack/{rackId}")
+    @Operation(
+            summary = "Delete a rack"
+    )
+    public void deleteRack(
+            @PathVariable int rackId
+    ) {
+        Rack rack = rackRepository.findById(rackId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No rack with id " + rackId + " was found"));
+        // Check all shelves in the rack
+        for (Shelf shelf : rack.getShelves()) {
+            List<BatchLocation> batchLocations = shelf.getBatchLocations();
+            // Throw error if the shelf is not empty (cannot delete rack then)
+            if (!batchLocations.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "The rack with id'" + rackId + "' has at least one batch on it and cannot be deleted");
+            }
+        }
+        shelfRepository.deleteByRack_Id(rackId);
+        rackRepository.deleteById(rackId);
+    }
+
+    @DeleteMapping("/Rack/{rackId}/{shelfId}")
+    @Operation(
+            summary = "Delete a shelf from a rack"
+    )public void deleteShelf(
+            @PathVariable int rackId,
+            @PathVariable int shelfId
+    ) {
+        // Throw error if rack doesn't exist
+        if (!rackRepository.existsById(rackId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A Rack with id '" + rackId + "' does not exist");
+        // Get the shelf from id
+        Optional<Shelf> optionalShelf = shelfRepository.findById(shelfId);
+        // Throw error if shelf doesn't exist
+        if (optionalShelf.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A shelf with id '" + shelfId + "' does not exist");
+        Shelf shelf = optionalShelf.get();
+        // Throw error if it is not on the rack
+        if (shelf.rack.id != rackId) throw new ResponseStatusException(HttpStatus.CONFLICT, "The shelf with id '" + shelfId + "' is not on rack with id '" + rackId + "'");
+        // Throw error if the shelf has at least one batch
+        if (!shelf.batchLocations.isEmpty()) throw new ResponseStatusException(HttpStatus.CONFLICT, "The shelf with id '" + shelfId + "' contains at least one batch and cannot be deleted");
+        shelfRepository.deleteById(shelfId);
+    }
 }

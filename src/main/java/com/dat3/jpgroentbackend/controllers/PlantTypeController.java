@@ -2,6 +2,7 @@ package com.dat3.jpgroentbackend.controllers;
 
 import com.dat3.jpgroentbackend.controllers.dto.request.CreatePlantTypeRequest;
 import com.dat3.jpgroentbackend.model.PlantType;
+import com.dat3.jpgroentbackend.model.repositories.BatchRepository;
 import com.dat3.jpgroentbackend.model.repositories.PlantTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -24,6 +25,8 @@ import java.util.Arrays;
 public class PlantTypeController{
     @Autowired
     private PlantTypeRepository plantTypeRepository;
+    @Autowired
+    private BatchRepository batchRepository;
 
     @PostMapping("/PlantType")
     @Operation(
@@ -57,4 +60,15 @@ public class PlantTypeController{
         return plantTypeRepository.findAll();
     }
 
+    @DeleteMapping("/PlantType/{plantTypeName}")
+    @Operation(
+            summary = "Delete a PlantType"
+    )
+    public void deletePlantType(
+            @PathVariable String plantTypeName
+    ) {
+        PlantType plantType = plantTypeRepository.findById(plantTypeName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A planttype with name '" + plantTypeName + "' does not exist"));
+        if (batchRepository.existsByPlantType_Name(plantTypeName)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete plant '" + plantTypeName + "' as at least one batch is using it");
+        plantTypeRepository.deleteById(plantTypeName);
+    }
 }

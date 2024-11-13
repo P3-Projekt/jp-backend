@@ -2,6 +2,7 @@ package com.dat3.jpgroentbackend.controllers;
 
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateTrayTypeRequest;
 import com.dat3.jpgroentbackend.model.TrayType;
+import com.dat3.jpgroentbackend.model.repositories.BatchRepository;
 import com.dat3.jpgroentbackend.model.repositories.TrayTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -23,6 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class TrayTypeController {
     @Autowired
     private TrayTypeRepository trayTypeRepository;
+    @Autowired
+    private BatchRepository batchRepository;
 
     @PostMapping("/TrayType")
     @Operation(
@@ -49,6 +52,7 @@ public class TrayTypeController {
             @PathVariable String trayTypeId
     ){
         if (!trayTypeRepository.existsById(trayTypeId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A TrayType with id '" + trayTypeId + "' does not exist");
+        if (batchRepository.existsByTrayType_Name(trayTypeId)) throw new ResponseStatusException(HttpStatus.CONFLICT, "The TrayType with id'" + trayTypeId + "' is currently used by at least one batch");
         trayTypeRepository.deleteById(trayTypeId);
     }
 

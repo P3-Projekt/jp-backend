@@ -14,8 +14,8 @@ public class RackDto {
         this.id = rack.id;
         this.xCoordinate = rack.xCoordinate;
         this.yCoordinate = rack.yCoordinate;
-        if(rack.shelves != null) {
-            this.shelves = rack.shelves.stream().map(ShelfDto::new).toList();
+        if(rack.getShelves() != null) {
+            this.shelves = rack.getShelves().stream().map(ShelfDto::new).toList();
         } else {
             this.shelves = new ArrayList<>();
         }
