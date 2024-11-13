@@ -2,10 +2,9 @@ package com.dat3.jpgroentbackend.model;
 
 import com.dat3.jpgroentbackend.model.repositories.utils.Vector2;
 import jakarta.persistence.*;
-import java.util.Collections;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class Rack {
@@ -39,17 +38,12 @@ public class Rack {
     public List<Shelf> getShelves() {
         return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
     }
-
     public void addShelf(Shelf shelf) {
         shelves.add(shelf);
     }
 
     public void removeShelf() {
         shelves.removeLast();
-    }
-
-    public void removeShelves() {
-        shelves.clear();
     }
 
     // Return true if all shelves in the rack is empty, false otherwise
@@ -61,7 +55,6 @@ public class Rack {
         }
         return true;
     }
-  
 
     //Gets a list where every index corresponds to a shelf and the value corresponds to the maximum amount of a batch which can be added to that shelf
     public List<Integer> getMaxAmountOnShelves(Batch batch) {
@@ -85,5 +78,3 @@ public class Rack {
         return maxAmountOnShelves;
     }
 }
-
-

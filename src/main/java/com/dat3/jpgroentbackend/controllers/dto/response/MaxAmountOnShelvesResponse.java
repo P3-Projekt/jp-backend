@@ -11,7 +11,7 @@ public class MaxAmountOnShelvesResponse {
 
     public MaxAmountOnShelvesResponse(Map<Rack, List<Integer>> maxAmountOnShelvesByRack) {
         for(Map.Entry<Rack, List<Integer>> entry : maxAmountOnShelvesByRack.entrySet()) {
-            maxAmountOnShelves.put(entry.getKey().id, entry.getValue());
+            maxAmountOnShelves.put(entry.getKey().getId(), entry.getValue());
         }
     }
 

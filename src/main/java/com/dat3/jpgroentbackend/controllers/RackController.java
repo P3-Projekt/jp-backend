@@ -136,7 +136,7 @@ public class RackController{
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "The top most shelf is not empty on rack with id '" + rackId + "'");
             }
         } catch (NoSuchElementException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The rack has no shelves to remove");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The rack has no shelves to remove");
         }
         rackRepository.save(rack);
     }

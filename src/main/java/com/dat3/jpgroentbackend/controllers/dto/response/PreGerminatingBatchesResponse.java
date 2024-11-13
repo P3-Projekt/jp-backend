@@ -17,7 +17,7 @@ public class PreGerminatingBatchesResponse {
         public BatchResponse(Batch batch) {
             this.batchId = batch.id;
             this.amount = batch.batchLocations.get(0).amount;
-            this.plantName = batch.plantType.name;
+            this.plantName = batch.plantType.getName();
             this.dueDate = batch.batchLocations.get(0).plantTask.dueDate;
         }
 
