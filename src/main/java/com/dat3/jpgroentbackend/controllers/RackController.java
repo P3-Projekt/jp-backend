@@ -41,7 +41,6 @@ public class RackController{
             summary = "Create new Rack"
     )
     public RackDto createRack(
-            @Valid
             @RequestBody CreateRackRequest request
     ){
         Rack rack = new Rack(request.xCoordinate, request.yCoordinate);
