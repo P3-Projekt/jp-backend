@@ -1,13 +1,13 @@
 package com.dat3.jpgroentbackend.controllers.dto.request;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateRackRequest {
-    @NotBlank
+    @NotNull
     @Min(0)
     public Integer xCoordinate;
-    @NotBlank
+    @NotNull
     @Min(0)
     public Integer yCoordinate;
 }

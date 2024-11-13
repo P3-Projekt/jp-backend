@@ -38,17 +38,17 @@ public class BatchLocation {
         this.amount = amount;
 
         //Plant from pre-germination task
-        LocalDate plantDueDate = LocalDate.now().plusDays(batch.plantType.preGerminationDays);
+        LocalDate plantDueDate = LocalDate.now().plusDays(batch.plantType.getPreGerminationDays());
         this.plantTask = new Task(Task.Category.Plant, plantDueDate);
 
         //Water tasks
-        for(int waterAfterDays : batch.plantType.wateringSchedule){
+        for(int waterAfterDays : batch.plantType.getWateringSchedule()){
             LocalDate waterDueDate = LocalDate.now().plusDays(waterAfterDays);
             this.wateringTasks.add(new Task(Task.Category.Water, waterDueDate));
         }
 
         //Harvest task
-        LocalDate harvestDueDate = LocalDate.now().plusDays(batch.plantType.growthTimeDays);
+        LocalDate harvestDueDate = LocalDate.now().plusDays(batch.plantType.getGrowthTimeDays());
         this.harvestingTask = new Task(Task.Category.Harvest, harvestDueDate);
     }
 

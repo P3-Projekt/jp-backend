@@ -68,7 +68,7 @@ public class ListTasksResponse {
             List<Task> tasks = entry.getValue();
 
             for(Task task : tasks){
-                TaskResponse taskResponse = new TaskResponse(batchLocation.batch.id, batchLocation.batch.plantType.name, task.category, batchLocation.amount, task.dueDate);
+                TaskResponse taskResponse = new TaskResponse(batchLocation.batch.id, batchLocation.batch.plantType.getName(), task.category, batchLocation.amount, task.dueDate);
 
                 //Combine matching task or add a new task
                 boolean taskWasCombined = false;

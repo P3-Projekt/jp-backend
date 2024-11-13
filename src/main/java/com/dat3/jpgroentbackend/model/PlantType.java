@@ -18,12 +18,12 @@ public class PlantType {
     }
 
     @Id
-    public String name;
-    public int preGerminationDays;
-    public int growthTimeDays;
-    public PreferredPosition preferredPosition;
+    private String name;
+    private int preGerminationDays;
+    private int growthTimeDays;
+    private PreferredPosition preferredPosition;
     @Convert(converter = IntArrayToJsonConverter.class)
-    public int[] wateringSchedule;
+    private int[] wateringSchedule;
 
     public PlantType(String name, int preGerminationDays, int growthTimeDays, PreferredPosition preferredPosition, int[] wateringSchedule) {
         this.name = name;
@@ -34,4 +34,24 @@ public class PlantType {
     }
 
     public PlantType() {}
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPreGerminationDays() {
+        return preGerminationDays;
+    }
+
+    public int getGrowthTimeDays() {
+        return growthTimeDays;
+    }
+
+    public PreferredPosition getPreferredPosition() {
+        return preferredPosition;
+    }
+
+    public int[] getWateringSchedule() {
+        return wateringSchedule;
+    }
 }

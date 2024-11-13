@@ -13,16 +13,16 @@ public class Shelf {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    public int id;
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "rack_id")
-    public Rack rack;
+    private Rack rack;
 
     @OneToMany(mappedBy = "shelf")
-    public List<BatchLocation> batchLocations = new ArrayList<>();
+    private List<BatchLocation> batchLocations = new ArrayList<>();
 
-    public int position;
+    private int position;
 
     public Shelf(){}
     public Shelf(Rack rack, int position) {
@@ -30,7 +30,31 @@ public class Shelf {
         this.position = position;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public boolean isEmpty() {
+        return this.batchLocations.isEmpty();
+    }
+
     public int getPosition() {
         return position;
+    }
+
+    public Rack getRack() {
+        return rack;
+    }
+
+    public List<BatchLocation> getBatchLocations() {
+        return batchLocations;
+    }
+
+    public void addBatchLocation(BatchLocation batchLocation) {
+        batchLocations.add(batchLocation);
+    }
+
+    public void removeBatchLocation(BatchLocation batchLocation) {
+        batchLocations.remove(batchLocation);
     }
 }
