@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @Tag(name = "Rack")
@@ -41,7 +42,6 @@ public class RackController{
             summary = "Create new Rack"
     )
     public RackDto createRack(
-            @Valid
             @RequestBody CreateRackRequest request
     ){
         Rack rack = new Rack(request.xCoordinate, request.yCoordinate);
@@ -131,7 +131,7 @@ public class RackController{
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A Rack with id '" + rackId + "' does not exist"));
         try {
             if (rack.getShelves().getLast().isEmpty()) {
-                rack.popShelf();
+                rack.removeShelf();
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "The top most shelf is not empty on rack with id '" + rackId + "'");
             }

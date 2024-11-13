@@ -7,11 +7,13 @@ import java.util.List;
 
 @Entity
 public class Shelf {
+
+    public static final int length = 100;
+    public static final int width = 80;
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
-
-    private boolean isEmpty = true; // A shelf starts out as being empty
 
     @ManyToOne
     @JoinColumn(name = "rack_id")
@@ -33,7 +35,7 @@ public class Shelf {
     }
 
     public boolean isEmpty() {
-        return isEmpty;
+        return this.batchLocations.isEmpty();
     }
 
     public int getPosition() {
@@ -50,11 +52,9 @@ public class Shelf {
 
     public void addBatchLocation(BatchLocation batchLocation) {
         batchLocations.add(batchLocation);
-        isEmpty = false;
     }
 
     public void removeBatchLocation(BatchLocation batchLocation) {
         batchLocations.remove(batchLocation);
-        if (batchLocations.isEmpty()) isEmpty = true;
     }
 }

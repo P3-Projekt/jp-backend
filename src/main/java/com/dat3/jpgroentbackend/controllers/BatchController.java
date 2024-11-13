@@ -1,7 +1,11 @@
 package com.dat3.jpgroentbackend.controllers;
 
+import com.dat3.jpgroentbackend.controllers.dto.BatchDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateBatchRequest;
 import com.dat3.jpgroentbackend.controllers.dto.request.UpdateBatchLocationRequest;
+import com.dat3.jpgroentbackend.controllers.dto.response.BatchResponse;
+import com.dat3.jpgroentbackend.controllers.dto.response.MaxAmountOnShelvesResponse;
+import com.dat3.jpgroentbackend.controllers.dto.response.PreGerminatingBatchesResponse;
 import com.dat3.jpgroentbackend.model.*;
 import com.dat3.jpgroentbackend.model.repositories.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +42,15 @@ public class BatchController {
     private ShelfRepository shelfRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private RackRepository rackRepository;
+
 
     @PostMapping("/Batch")
     @Operation(
             summary = "Create new Batch"
     )
-    public Batch createBatch(
+    public BatchDto createBatch(
             @Valid
             @RequestBody CreateBatchRequest request
             ) {
@@ -56,25 +64,59 @@ public class BatchController {
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + request.createdByUsername + "' was not found"));
 
         //Create batch
-        Batch batch = new Batch(plantType, trayType, createdBy);
+        Batch batch = new Batch(request.amount, plantType, trayType, createdBy);
 
-        //Map batch to locations
-        List<BatchLocation> batchLocations = new ArrayList<>();
-        for(Map.Entry<Integer, Integer> location : request.locations.entrySet()) {
-            int shelfId = location.getKey();
-            int amount = location.getValue();
-            Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Shelf with id '" + shelfId + "' was not found"));
-            batchLocations.add(new BatchLocation(batch, shelf, amount));
-        }
-
-        //Save tasks to database
-        taskRepository.saveAll(batch.tasks);
         //Save batch to database
         Batch batchSaved = batchRepository.save(batch);
+        //Save tasks to database
+        taskRepository.saveAll(batch.getAllTasks());
         //Save locations to database
-        batchLocationRepository.saveAll(batchLocations);
+        batchLocationRepository.saveAll(batch.batchLocations);
 
-        return batchSaved;
+        return new BatchDto(batchSaved);
+    }
+
+    @GetMapping("/PreGerminatingBatches")
+    @Operation(
+            summary = "Get a list of pre-germinating batches"
+    )
+    public PreGerminatingBatchesResponse getPreGerminatingBatches(){
+        List<Batch> batches = new ArrayList<>();
+        batchRepository.findAll().forEach(batches::add);
+        List<Batch> preGerminatingBatches = Batch.filterPreGerminatingBatches(batches);
+        return new PreGerminatingBatchesResponse(preGerminatingBatches);
+    }
+
+    @GetMapping("/Batches")
+    @Operation(
+            summary = "Get a list of batches"
+    )
+    public List<BatchResponse> getBatches(){
+        List<Batch> batches = new ArrayList<>();
+        batchRepository.findAll().forEach(batches::add);
+        return batches.stream().map(BatchResponse::new).toList();
+    }
+
+    @GetMapping("/Batch/{batchId}/MaxAmountOnShelves")
+    @Operation(
+            summary = "Get the max amount of batchId which can be added to every shelf"
+    )
+    public Map<Integer, List<Integer>> getMaxAmountOnShelves(
+            @PathVariable Integer batchId
+    ){
+
+        //Find batch in database or throw error
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Batch with id '" + batchId + "' was not found"));
+
+
+        Map<Rack, List<Integer>> maxAmountOnShelvesByRack = new HashMap<>();
+        //Populate maxAmountOnShelvesByRack
+        rackRepository.findAll().forEach(rack -> {
+            maxAmountOnShelvesByRack.put(rack, rack.getMaxAmountOnShelves(batch));
+        });
+
+        return new MaxAmountOnShelvesResponse(maxAmountOnShelvesByRack).getMaxAmountOnShelves();
     }
 
     @GetMapping("/Batch")

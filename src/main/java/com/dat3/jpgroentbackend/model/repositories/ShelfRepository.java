@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface ShelfRepository extends CrudRepository<Shelf, Integer> {
     Optional<Shelf> findFirstByRackOrderByPositionDesc(Rack rack);
+    void deleteByRack_Id(int rackId);
 }
