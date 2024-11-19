@@ -11,6 +11,6 @@ public class CreateBatchRequest {
     @NotNull
     public String createdByUsername;
     @NotNull
-    @Min(0)
+    @Min(1)
     public Integer amount;
 }

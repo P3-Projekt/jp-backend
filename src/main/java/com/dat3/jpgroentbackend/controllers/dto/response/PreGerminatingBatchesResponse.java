@@ -16,9 +16,9 @@ public class PreGerminatingBatchesResponse {
 
         public BatchResponse(Batch batch) {
             this.batchId = batch.id;
-            this.amount = batch.batchLocations.get(0).amount;
+            this.amount = batch.getAmount();
             this.plantName = batch.plantType.getName();
-            this.dueDate = batch.batchLocations.get(0).plantTask.dueDate;
+            this.dueDate = batch.getPlantTask().dueDate;
         }
 
         public int getBatchId() {
@@ -43,7 +43,7 @@ public class PreGerminatingBatchesResponse {
 
     public PreGerminatingBatchesResponse(List<Batch> preGerminatingBatches) {
         for(Batch batch : preGerminatingBatches) {
-            LocalDate plantDueDate = batch.batchLocations.get(0).plantTask.dueDate;
+            LocalDate plantDueDate = batch.getPlantTask().dueDate;
             if(plantDueDate.isAfter(LocalDate.now())) {
                 needsMorePreGermination.add(new BatchResponse(batch));
             } else {

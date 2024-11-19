@@ -9,10 +9,6 @@ import com.dat3.jpgroentbackend.controllers.dto.response.PreGerminatingBatchesRe
 import com.dat3.jpgroentbackend.model.*;
 import com.dat3.jpgroentbackend.model.repositories.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +37,6 @@ public class BatchController {
     @Autowired
     private ShelfRepository shelfRepository;
     @Autowired
-    private TaskRepository taskRepository;
-    @Autowired
     private RackRepository rackRepository;
 
 
@@ -68,10 +62,6 @@ public class BatchController {
 
         //Save batch to database
         Batch batchSaved = batchRepository.save(batch);
-        //Save tasks to database
-        taskRepository.saveAll(batch.getAllTasks());
-        //Save locations to database
-        batchLocationRepository.saveAll(batch.batchLocations);
 
         return new BatchDto(batchSaved);
     }
@@ -112,23 +102,9 @@ public class BatchController {
 
         Map<Rack, List<Integer>> maxAmountOnShelvesByRack = new HashMap<>();
         //Populate maxAmountOnShelvesByRack
-        rackRepository.findAll().forEach(rack -> {
-            maxAmountOnShelvesByRack.put(rack, rack.getMaxAmountOnShelves(batch));
-        });
+        rackRepository.findAll().forEach(rack -> maxAmountOnShelvesByRack.put(rack, rack.getMaxAmountOnShelves(batch)));
 
         return new MaxAmountOnShelvesResponse(maxAmountOnShelvesByRack).getMaxAmountOnShelves();
-    }
-
-    @GetMapping("/Batch")
-    @Operation(
-            summary = "Get all batches",
-            responses = {
-            @ApiResponse(content = {@Content(array = @ArraySchema(schema = @Schema(implementation = Batch.class)))})
-    }
-    )
-    public Iterable<Batch> getAllBatches(
-    ){
-        return batchRepository.findAll();
     }
 
     @PutMapping("/Batch/{batchId}/Position")

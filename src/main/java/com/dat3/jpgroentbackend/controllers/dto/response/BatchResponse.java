@@ -16,8 +16,8 @@ public class BatchResponse {
     public BatchResponse(Batch batch) {
         this.plantName = batch.plantType.getName();
         this.trayName = batch.trayType.getName();
-        this.creationDate = batch.batchLocations.get(0).plantTask.dueDate.minusDays(batch.plantType.getPreGerminationDays());
-        this.harvestDate = batch.batchLocations.get(0).harvestingTask.dueDate;
+        this.creationDate = batch.getPlantTask().dueDate.minusDays(batch.plantType.getPreGerminationDays());
+        this.harvestDate = batch.getHarvestingTask().dueDate;
         this.createdBy = batch.createdBy.getName();
         this.amount = batch.batchLocations.stream().map(batchLocation -> batchLocation.amount).reduce(0, Integer::sum);
         this.batchId = batch.id;
