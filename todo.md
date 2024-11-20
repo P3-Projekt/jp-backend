@@ -1,4 +1,5 @@
 # Todo
+- Implement BatchLocation as HashMap
 - Implement Autolokate
 - All fields of classes must be private with getter
 - Remove unused methods/imports
