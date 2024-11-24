@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Entity
 public class Batch {
@@ -25,7 +28,7 @@ public class Batch {
     public User createdBy;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<BatchLocation> batchLocations = new ArrayList<>();
+    public final List<BatchLocation> batchLocations = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Task> wateringTasks = new ArrayList<>();
@@ -69,7 +72,7 @@ public class Batch {
         locationTasks.add(this.harvestingTask);
 
         //Filter away completed tasks
-        List<Task> incompleteLocationTasks = locationTasks.stream().filter(task -> task.completedAt != null).toList();
+        List<Task> incompleteLocationTasks = locationTasks.stream().filter(task -> task.completedAt == null).toList();
         if(incompleteLocationTasks.isEmpty()){return null;}
 
         //Find most relevant task
@@ -86,6 +89,22 @@ public class Batch {
         return nextTask;
 
     }
+
+
+    public LocalDate getLatestCompletedTaskDate(){
+        LocalDateTime latestCompletesTaskTime = getTasks().stream()
+                .map(task -> task.completedAt)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+        if(latestCompletesTaskTime == null){
+            return null;
+        } else {
+            return latestCompletesTaskTime.toLocalDate();
+        }
+    }
+
+
 
     public List<Task> getTasks(){
         List<Task> tasks = new ArrayList<>();

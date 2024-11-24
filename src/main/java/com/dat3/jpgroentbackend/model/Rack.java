@@ -16,7 +16,7 @@ public class Rack {
     private Vector2 position;
 
     @OneToMany(mappedBy = "rack", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Shelf> shelves;
+    private final List<Shelf> shelves = new ArrayList<>();
 
     public Rack(){}
     public Rack(int xCoordinate, int yCoordinate) {

@@ -3,6 +3,7 @@ package com.dat3.jpgroentbackend.controllers;
 import com.dat3.jpgroentbackend.controllers.dto.RackDto;
 import com.dat3.jpgroentbackend.controllers.dto.ShelfDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateRackRequest;
+import com.dat3.jpgroentbackend.controllers.dto.response.RacksResponse;
 import com.dat3.jpgroentbackend.model.Batch;
 import com.dat3.jpgroentbackend.model.BatchLocation;
 import com.dat3.jpgroentbackend.model.Rack;
@@ -56,8 +57,8 @@ public class RackController{
             @ApiResponse(content = {@Content(array = @ArraySchema(schema = @Schema(implementation = RackDto.class)))})
         }
     )
-    public List<RackDto> getAllRacks() {
-        return rackRepository.findAll().stream().map(RackDto::new).toList();
+    public List<RacksResponse> getAllRacks() {
+        return rackRepository.findAll().stream().map(RacksResponse::new).toList();
     }
 
     @PutMapping("/Rack/{rackId}/Position")
