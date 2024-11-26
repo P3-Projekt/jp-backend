@@ -11,10 +11,9 @@ import java.util.Arrays;
 public class PlantType {
 
     public enum PreferredPosition {
-        Low,
-        Middle,
-        High,
-        NoPreferred
+        Nederst,
+        Øverst,
+        Ligegyldigt
     }
 
     @Id
