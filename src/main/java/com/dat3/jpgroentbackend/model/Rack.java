@@ -36,7 +36,10 @@ public class Rack {
     }
 
     public List<Shelf> getShelves() {
-        return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
+        if (shelves != null) {
+            return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
+        }
+        return null;
     }
     public void addShelf(Shelf shelf) {
         shelves.add(shelf);
