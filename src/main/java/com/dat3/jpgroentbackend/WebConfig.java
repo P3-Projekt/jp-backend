@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Apply CORS to all endpoints
-                        .allowedOrigins("http://localhost:3000") // Allow only the frontend origin
+                        .allowedOrigins("http://localhost:3000","https://orange-goldfish-v4g47wv4wpx2vrq-3000.app.github.dev") // Allow only the frontend origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
                         .allowedHeaders("*") // Allow all headers
                         .allowCredentials(true); // Allow cookies or authorization headers if needed
