@@ -8,7 +8,7 @@ public class User {
 
     public enum Role{
         Gardener,
-        Admin,
+        Administrator,
         Manager
     }
 
@@ -37,5 +37,14 @@ public class User {
 
     public void setInactive() {
         active = false;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    // Add a method to set active (since you currently only have setInactive())
+    public void setActive() {
+        active = true;
     }
 }

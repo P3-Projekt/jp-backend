@@ -59,4 +59,24 @@ public class UserController {
         user.setInactive();
         userRepository.save(user);
     }
+
+    @PutMapping("/Users/{name}/activate")
+    @Operation(
+            summary = "Reactivate a user"
+    )
+    public void reactivateUser(
+            @PathVariable String name
+    ) {
+        User user = userRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+
+        if (user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already active");
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
+    }
 }
+
+
