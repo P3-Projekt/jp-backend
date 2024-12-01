@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -26,9 +27,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+        // Log alle anmodninger for at sikre, at OPTIONS bliver modtaget
+        System.out.println("Request Method: " + request.getMethod());
 
+        if ("OPTIONS".equals(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK); // Returner status 200 for OPTIONS-anmodninger
+            return;
+        }
+
+        // Fortsæt med den oprindelige logik
         final String authHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwt = null;
 
@@ -52,4 +60,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
     }
+
 }
