@@ -8,4 +8,6 @@ public class CreateUserRequest {
     public String name;
     @NotNull
     public User.Role role;
+    @NotNull
+    public String password;
 }
