@@ -96,7 +96,6 @@ public class UserController {
         User user = userRepository.findById(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
 
-        // Update user details
         if (request.role != null) {
             user.setRole(request.role);
         }
