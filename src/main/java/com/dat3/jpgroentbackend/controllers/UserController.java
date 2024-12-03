@@ -13,14 +13,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @RestController
 @Tag(name = "User")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/User")
     @Operation(
@@ -29,19 +35,13 @@ public class UserController {
     public User createUser(
             @Valid
             @RequestBody CreateUserRequest request
-    ) {
-        //Check if name is not already used
-        if(userRepository.existsById(request.name)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A User with name '" + request.name + "' already exists");
-        }
-        User user = new User(
-                request.name,
-                request.role,
-                request.telephone,
-                request.email,
-                request.address
-        );
-        return userRepository.save(user);
+            ) {
+            //Check if name i not already used
+            if(userRepository.existsById(request.name)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT ,"A User with name '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
+            }
+        User user = new User(request.name, request.role, passwordEncoder.encode(request.password));
+            return userRepository.save(user);
     }
 
     @GetMapping("/Users")

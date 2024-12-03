@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, String> {
+
     Optional<User> findByNameAndActive(String name, boolean active);
 
+    Optional<User> findByName(String name);
     List<User> findByActive(boolean active);
 }

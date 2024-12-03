@@ -11,10 +11,6 @@ public class CreateUserRequest {
     @NotNull
     public User.Role role;
 
-    public String telephone;
-
-    @Email(message = "Invalid email format")
-    public String email;
-
-    public String address;
+    @NotNull
+    public String password;
 }

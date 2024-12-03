@@ -16,26 +16,27 @@ public class User {
     private String name;
     private Role role;
     private boolean active = true;
-    private String telephone;
-    private String email;
-    private String address;
+    private String password;
 
     public User(){}
-
-    public User(String name, Role role, String telephone, String email, String address){
+    public User(String name, Role role, String password){
         this.name = name;
         this.role = role;
-        this.telephone = telephone;
-        this.email = email;
-        this.address = address;
+        this.password = password;
     }
 
     public String getName() {
         return name;
     }
 
+    public String getPassword() {return password;}
+
     public Role getRole() {
         return role;
+    }
+  
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public boolean isActive() {
@@ -46,6 +47,14 @@ public class User {
         active = false;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -54,31 +63,5 @@ public class User {
         active = true;
     }
 
-    public String getTelephone() {
-        return telephone;
-    }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
 }
