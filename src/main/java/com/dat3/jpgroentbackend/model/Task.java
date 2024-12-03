@@ -50,4 +50,8 @@ public class Task {
     public Batch getBatch() {
         return batch;
     }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
 }

@@ -119,6 +119,9 @@ public class Batch {
     public int getAmount(){
         return this.batchLocations.stream().map(batchLocation -> batchLocation.amount).reduce(0, Integer::sum);
     }
+    public PlantType getPlantType() {
+        return plantType;
+    }
 
     public Task getPlantTask() {
         return plantTask;
@@ -145,5 +148,4 @@ public class Batch {
     public static List<Batch> filterPreGerminatingBatches(List<Batch> batches){
         return batches.stream().filter(batch -> batch.plantTask.completedAt == null).toList();
     }
-
 }

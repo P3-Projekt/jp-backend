@@ -99,15 +99,6 @@ public class UserController {
         if (request.role != null) {
             user.setRole(request.role);
         }
-        if (request.telephone != null) {
-            user.setTelephone(request.telephone);
-        }
-        if (request.email != null) {
-            user.setEmail(request.email);
-        }
-        if (request.address != null) {
-            user.setAddress(request.address);
-        }
 
         return userRepository.save(user);
     }

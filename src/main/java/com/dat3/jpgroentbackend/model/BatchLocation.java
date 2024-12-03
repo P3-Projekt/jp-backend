@@ -23,4 +23,8 @@ public class BatchLocation {
         this.shelf = shelf;
         this.amount = amount;
     }
+
+    public Batch getBatch() {
+        return batch;
+    }
 }
