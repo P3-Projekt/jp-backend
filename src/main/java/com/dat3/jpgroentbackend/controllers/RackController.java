@@ -81,7 +81,7 @@ public class RackController{
     @Operation(
             summary = "Create new Shelf"
     )
-    public ShelfDto createShelf(
+    public RacksResponse createShelf(
             @PathVariable int rackId
     ){
         Rack rack = rackRepository.findById(rackId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No rack with id " + rackId + " was found"));
@@ -90,7 +90,7 @@ public class RackController{
 
         Shelf shelf = new Shelf(rack, highestShelfLevel + 1);
         shelfRepository.save(shelf);
-        return new ShelfDto(shelf);
+        return new RacksResponse(rack);
     }
 
     @GetMapping("/Rack/{rackId}/Batches")
@@ -126,7 +126,7 @@ public class RackController{
     @DeleteMapping("/Rack/{rackId}/Shelf")
     @Operation(
             summary = "Delete a shelf from a rack"
-    )public void deleteShelf(@PathVariable int rackId) {
+    )public RacksResponse deleteShelf(@PathVariable int rackId) {
         // Throw error if rack doesn't exist
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A Rack with id '" + rackId + "' does not exist"));
@@ -140,5 +140,6 @@ public class RackController{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The rack has no shelves to remove");
         }
         rackRepository.save(rack);
+        return new RacksResponse(rack);
     }
 }

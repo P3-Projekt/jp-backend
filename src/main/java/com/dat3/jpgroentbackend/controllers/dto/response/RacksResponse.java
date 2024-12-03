@@ -146,7 +146,7 @@ public class RacksResponse {
     public RacksResponse(Rack rack){
         this.id = rack.getId();
         this.position = new Position(rack.getPosition());
-        rack.getShelves().forEach(shelf -> this.shelves.add(new ShelfResponse(shelf)));
+        rack.getShelves().reversed().forEach(shelf -> this.shelves.add(new ShelfResponse(shelf)));
     }
 
     public int getId() {
