@@ -60,8 +60,8 @@ public class TaskController {
                 ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with id '" + taskId + "' was not found")
         );
 
-        User user = userRepository.findById(request.getUsername()).orElseThrow(
-                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id '" + request.getUsername() + "' was not found")
+        User user = userRepository.findById(request.username).orElseThrow(
+                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id '" + request.username + "' was not found")
         );
         task.complete(user);
         taskRepository.save(task);

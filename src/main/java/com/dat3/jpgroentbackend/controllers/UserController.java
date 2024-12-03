@@ -1,6 +1,7 @@
 package com.dat3.jpgroentbackend.controllers;
 
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateUserRequest;
+import com.dat3.jpgroentbackend.controllers.dto.request.UpdateUserRequest;
 import com.dat3.jpgroentbackend.model.User;
 import com.dat3.jpgroentbackend.model.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,4 +66,50 @@ public class UserController {
         user.setInactive();
         userRepository.save(user);
     }
+
+    @PutMapping("/Users/{name}/activate")
+    @Operation(
+            summary = "Reactivate a user"
+    )
+    public void reactivateUser(
+            @PathVariable String name
+    ) {
+        User user = userRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+
+        if (user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already active");
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @PutMapping("/Users/{name}")
+    @Operation(
+            summary = "Update user details"
+    )
+    public User updateUser(
+            @PathVariable String name,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
+        User user = userRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+
+        if (request.role != null) {
+            user.setRole(request.role);
+        }
+        if (request.telephone != null) {
+            user.setTelephone(request.telephone);
+        }
+        if (request.email != null) {
+            user.setEmail(request.email);
+        }
+        if (request.address != null) {
+            user.setAddress(request.address);
+        }
+
+        return userRepository.save(user);
+    }
+
 }

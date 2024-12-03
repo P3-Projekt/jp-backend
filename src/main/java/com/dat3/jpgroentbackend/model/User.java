@@ -8,7 +8,7 @@ public class User {
 
     public enum Role{
         Gardener,
-        Admin,
+        Administrator,
         Manager
     }
 
@@ -34,6 +34,10 @@ public class User {
     public Role getRole() {
         return role;
     }
+  
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public boolean isActive() {
         return active;
@@ -47,15 +51,16 @@ public class User {
         this.name = name;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setPassword(String password) {
+        this.password = password;
     }
+
     public void setActive(boolean active) {
         this.active = active;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setActive() {
+        active = true;
     }
 
 
