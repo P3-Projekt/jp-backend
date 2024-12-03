@@ -111,7 +111,7 @@ public class BatchController {
     @Operation(
             summary = "Update the position of a batch"
     )
-        public List<BatchLocation> updateBatchPosition(
+        public void updateBatchPosition(
             @PathVariable int batchId,
             @Valid
             @RequestBody UpdateBatchLocationRequest request
@@ -119,14 +119,20 @@ public class BatchController {
 
         // Check if the batch exists and get a batch object
         Batch batch = batchRepository.findById(batchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
+        // Check if user exists
+        User user = userRepository.findById(request.username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
 
-        // Check if the total amount in the request matches the total amount in the batch currently
-        if (request.locations.values().stream().mapToInt(Integer::intValue).sum() != batchLocationRepository.findAmountByBatchId(batchId).stream().mapToInt(Integer::intValue).sum()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The total amount provided in the request does not equal the current amount for the batch");
+
+        // Get amount from empty batch location and remove it
+        if(batch.batchLocations.size() != 1 || batch.batchLocations.getFirst().shelf != null){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Batch already has locations");
         }
+        BatchLocation emptyBatchLocation = batch.batchLocations.getFirst();
+        int batchAmount = emptyBatchLocation.amount;
 
-        // Delete previous batchLocations for this batch
-        batchLocationRepository.deleteAllByBatch(batch);
+        // Check if location amounts are complete
+        int locatedAmount = request.locations.values().stream().reduce(0, Integer::sum);
+        if(batchAmount != locatedAmount) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Located amount was " + locatedAmount + " but batch contains " + batchAmount + " fields");
 
         // Create batchLocations with the values from the request body
         List<BatchLocation> batchLocations = new ArrayList<>();
@@ -135,11 +141,15 @@ public class BatchController {
             int amount = location.getValue();
             Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Shelf with id '" + shelfId + "' was not found"));
             batchLocations.add(new BatchLocation(batch, shelf, amount));
-            }
+        }
 
-        batchLocationRepository.saveAll(batchLocations);
 
-        return batchLocations;
+        // Populate batch with newly created locations
+        batch.batchLocations.clear();
+        batch.batchLocations.addAll(batchLocations);
+        //batch.
+        batch.getPlantTask().complete(user);
+        batchRepository.save(batch);
         }
 
 }

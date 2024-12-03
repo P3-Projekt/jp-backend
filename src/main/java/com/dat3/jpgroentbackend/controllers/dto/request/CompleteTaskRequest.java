@@ -4,13 +4,7 @@ import com.dat3.jpgroentbackend.model.User;
 
 public class CompleteTaskRequest {
 
-    private final String username;
+    public String username;
 
-    public CompleteTaskRequest(String username) {
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
+    public CompleteTaskRequest() {}
 }

@@ -1,6 +1,7 @@
 package com.dat3.jpgroentbackend.controllers;
 
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateUserRequest;
+import com.dat3.jpgroentbackend.controllers.dto.request.UpdateUserRequest;
 import com.dat3.jpgroentbackend.model.User;
 import com.dat3.jpgroentbackend.model.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,14 +13,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @RestController
 @Tag(name = "User")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/User")
     @Operation(
@@ -33,7 +40,7 @@ public class UserController {
             if(userRepository.existsById(request.name)){
                 throw new ResponseStatusException(HttpStatus.CONFLICT ,"A User with name '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
             }
-            User user = new User(request.name, request.role);
+        User user = new User(request.name, request.role, passwordEncoder.encode(request.password));
             return userRepository.save(user);
     }
 
@@ -59,4 +66,50 @@ public class UserController {
         user.setInactive();
         userRepository.save(user);
     }
+
+    @PutMapping("/Users/{name}/activate")
+    @Operation(
+            summary = "Reactivate a user"
+    )
+    public void reactivateUser(
+            @PathVariable String name
+    ) {
+        User user = userRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+
+        if (user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already active");
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @PutMapping("/Users/{name}")
+    @Operation(
+            summary = "Update user details"
+    )
+    public User updateUser(
+            @PathVariable String name,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
+        User user = userRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
+
+        if (request.role != null) {
+            user.setRole(request.role);
+        }
+        if (request.telephone != null) {
+            user.setTelephone(request.telephone);
+        }
+        if (request.email != null) {
+            user.setEmail(request.email);
+        }
+        if (request.address != null) {
+            user.setAddress(request.address);
+        }
+
+        return userRepository.save(user);
+    }
+
 }

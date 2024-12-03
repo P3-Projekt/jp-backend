@@ -3,6 +3,7 @@ package com.dat3.jpgroentbackend.controllers;
 import com.dat3.jpgroentbackend.controllers.dto.RackDto;
 import com.dat3.jpgroentbackend.controllers.dto.ShelfDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateRackRequest;
+import com.dat3.jpgroentbackend.controllers.dto.response.RacksResponse;
 import com.dat3.jpgroentbackend.model.Batch;
 import com.dat3.jpgroentbackend.model.BatchLocation;
 import com.dat3.jpgroentbackend.model.Rack;
@@ -56,8 +57,8 @@ public class RackController{
             @ApiResponse(content = {@Content(array = @ArraySchema(schema = @Schema(implementation = RackDto.class)))})
         }
     )
-    public List<RackDto> getAllRacks() {
-        return rackRepository.findAll().stream().map(RackDto::new).toList();
+    public List<RacksResponse> getAllRacks() {
+        return rackRepository.findAll().stream().map(RacksResponse::new).toList();
     }
 
     @PutMapping("/Rack/{rackId}/Position")
@@ -80,7 +81,7 @@ public class RackController{
     @Operation(
             summary = "Create new Shelf"
     )
-    public ShelfDto createShelf(
+    public RacksResponse createShelf(
             @PathVariable int rackId
     ){
         Rack rack = rackRepository.findById(rackId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No rack with id " + rackId + " was found"));
@@ -89,7 +90,7 @@ public class RackController{
 
         Shelf shelf = new Shelf(rack, highestShelfLevel + 1);
         shelfRepository.save(shelf);
-        return new ShelfDto(shelf);
+        return new RacksResponse(rack);
     }
 
     @GetMapping("/Rack/{rackId}/Batches")
@@ -125,7 +126,7 @@ public class RackController{
     @DeleteMapping("/Rack/{rackId}/Shelf")
     @Operation(
             summary = "Delete a shelf from a rack"
-    )public void deleteShelf(@PathVariable int rackId) {
+    )public RacksResponse deleteShelf(@PathVariable int rackId) {
         // Throw error if rack doesn't exist
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A Rack with id '" + rackId + "' does not exist"));
@@ -139,5 +140,6 @@ public class RackController{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The rack has no shelves to remove");
         }
         rackRepository.save(rack);
+        return new RacksResponse(rack);
     }
 }

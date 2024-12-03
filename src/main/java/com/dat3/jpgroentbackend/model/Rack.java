@@ -16,7 +16,7 @@ public class Rack {
     private Vector2 position;
 
     @OneToMany(mappedBy = "rack", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Shelf> shelves;
+    private final List<Shelf> shelves = new ArrayList<>();
 
     public Rack(){}
     public Rack(int xCoordinate, int yCoordinate) {
@@ -36,7 +36,10 @@ public class Rack {
     }
 
     public List<Shelf> getShelves() {
-        return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
+        if (shelves != null) {
+            return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
+        }
+        return null;
     }
     public void addShelf(Shelf shelf) {
         shelves.add(shelf);

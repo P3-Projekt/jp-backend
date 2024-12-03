@@ -21,7 +21,7 @@ public class Task {
     public Category category;
     public LocalDate dueDate;
 
-    @OneToOne
+    @ManyToOne
     public User completedBy;
 
     @ManyToOne

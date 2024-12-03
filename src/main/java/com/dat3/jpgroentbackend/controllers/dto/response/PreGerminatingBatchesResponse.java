@@ -39,7 +39,7 @@ public class PreGerminatingBatchesResponse {
     }
 
     private final List<BatchResponse> needsMorePreGermination = new ArrayList<>();
-    private final List<BatchResponse> canBeMoved = new ArrayList<>();
+    private final List<BatchResponse> canBePlaced = new ArrayList<>();
 
     public PreGerminatingBatchesResponse(List<Batch> preGerminatingBatches) {
         for(Batch batch : preGerminatingBatches) {
@@ -47,7 +47,7 @@ public class PreGerminatingBatchesResponse {
             if(plantDueDate.isAfter(LocalDate.now())) {
                 needsMorePreGermination.add(new BatchResponse(batch));
             } else {
-                canBeMoved.add(new BatchResponse(batch));
+                canBePlaced.add(new BatchResponse(batch));
             }
         }
     }
@@ -56,7 +56,7 @@ public class PreGerminatingBatchesResponse {
         return needsMorePreGermination;
     }
 
-    public List<BatchResponse> getCanBeMoved() {
-        return canBeMoved;
+    public List<BatchResponse> getCanBePlaced() {
+        return canBePlaced;
     }
 }
