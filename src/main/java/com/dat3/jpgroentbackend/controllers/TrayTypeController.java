@@ -67,5 +67,4 @@ public class TrayTypeController {
 
         return trayTypeRepository.findAll();
     }
-
 }

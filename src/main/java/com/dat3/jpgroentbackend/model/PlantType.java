@@ -12,7 +12,6 @@ public class PlantType {
 
     public enum PreferredPosition {
         Low,
-        Middle,
         High,
         NoPreferred
     }
@@ -55,3 +54,4 @@ public class PlantType {
         return wateringSchedule;
     }
 }
+
