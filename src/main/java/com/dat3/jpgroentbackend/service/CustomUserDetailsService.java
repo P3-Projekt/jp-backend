@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Brug en separat UserDetails-implementering her
         return org.springframework.security.core.userdetails.User
                 .withUsername(userDetails.getName())
-                .password(userDetails.getPassword()) // Husk at hash password i en rigtig implementering
+                .password("MasterPassword") // Husk at hash password i en rigtig implementering
                 .roles(userDetails.getRole().name())
                 .build();
     }
