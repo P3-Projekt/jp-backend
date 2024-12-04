@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Brug en separat UserDetails-implementering her
         return org.springframework.security.core.userdetails.User
                 .withUsername(userDetails.getName())
-                .password(new BCryptPasswordEncoder().encode("MasterPassword")) // Husk at hash password i en rigtig implementering
+                .password(userDetails.getPassword()) // Husk at hash password i en rigtig implementering
                 .roles(userDetails.getRole().name())
                 .build();
     }
