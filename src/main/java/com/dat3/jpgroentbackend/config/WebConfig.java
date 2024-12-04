@@ -14,20 +14,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")  // Tillad anmodninger fra din frontend
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true);  // Tillad credentials/cookies
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // Tillad anmodninger fra frontend
-        configuration.addAllowedMethod("*");  // Tillad alle HTTP-metoder
-        configuration.addAllowedHeader("Authorization"); // Tillad autorisation header
-        configuration.setAllowCredentials(true); // Tillad cookies
-
-        // Registrer konfigurationen
-        return request -> configuration;
     }
 }
