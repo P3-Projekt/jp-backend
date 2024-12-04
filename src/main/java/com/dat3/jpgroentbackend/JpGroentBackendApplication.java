@@ -12,16 +12,4 @@ public class JpGroentBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(JpGroentBackendApplication.class, args);
     }
-
-    @Configuration
-    public static class WebConfig implements WebMvcConfigurer {
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/**") // Apply CORS to all endpoints
-                    .allowedOrigins("http://localhost:3000") // Your frontend URL
-                    .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
-                    .allowedHeaders("*") // Allow all headers
-                    .allowCredentials(true); // Allow credentials (cookies, etc.)
-        }
-    }
 }

@@ -27,7 +27,7 @@ public class DemoDataConfig {
                 User demoUser = new User();
                 demoUser.setName("demo");
                 demoUser.setPassword(passwordEncoder.encode("12345")); // Use a simple password for testing
-                demoUser.setRole(User.Role.Admin); // Set the role as needed
+                demoUser.setRole(User.Role.Administrator); // Set the role as needed
                 demoUser.setActive(true); // Set the user as active
 
                 userRepository.save(demoUser);
