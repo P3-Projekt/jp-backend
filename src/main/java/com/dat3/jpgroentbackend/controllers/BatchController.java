@@ -21,9 +21,9 @@ import com.dat3.jpgroentbackend.model.PlantType.PreferredPosition;
 import java.time.LocalDate;
 import java.util.*;
 
-// REST controller for managing batch-related operations
-@RestController
-@Tag(name = "Batch")
+
+@RestController // REST controller for managing batch-related operations
+@Tag(name = "Batch") // Swagger tag for the Batch controller
 public class BatchController {
 
     // Dependencies are injected for accessing various repositories
@@ -44,7 +44,11 @@ public class BatchController {
     @Autowired
     private SecurityExpressionHandler securityExpressionHandler;
 
-
+    /**
+     * Creates a new batch based on the request data.
+     * @param request CreateBatchRequest object containing details for the new batch
+     * @return BatchDto representation of the newly created batch
+     */
     @PostMapping("/Batch")
     @Operation(
             summary = "Create new Batch"
@@ -72,6 +76,10 @@ public class BatchController {
         return new BatchDto(batchSaved);
     }
 
+    /**
+     * Fetches all pre-germinating batches.
+     * @return PreGerminatingBatchesResponse containing a list of pre-germinating batches
+     */
     @GetMapping("/PreGerminatingBatches")
     @Operation(
             summary = "Get a list of pre-germinating batches"
@@ -83,6 +91,10 @@ public class BatchController {
         return new PreGerminatingBatchesResponse(preGerminatingBatches);
     }
 
+    /**
+     * Retrieves all batches.
+     * @return List of BatchResponse objects representing all batches
+     */
     @GetMapping("/Batches")
     @Operation(
             summary = "Get a list of batches"
@@ -93,6 +105,11 @@ public class BatchController {
         return batches.stream().map(BatchResponse::new).toList();
     }
 
+    /**
+     * Calculates the maximum amount of a batch that can be added to each shelf.
+     * @param batchId ID of the batch
+     * @return A map of shelf positions to maximum batch amounts
+     */
     @GetMapping("/Batch/{batchId}/MaxAmountOnShelves")
     @Operation(
             summary = "Get the max amount of batchId which can be added to every shelf"
@@ -113,6 +130,11 @@ public class BatchController {
         return new MaxAmountOnShelvesResponse(maxAmountOnShelvesByRack).getMaxAmountOnShelves();
     }
 
+    /**
+     * Updates the position of a batch.
+     * @param batchId ID of the batch to update
+     * @param request UpdateBatchLocationRequest containing new position details
+     */
     @PutMapping("/Batch/{batchId}/Position")
     @Operation(
             summary = "Update the position of a batch"
@@ -158,12 +180,15 @@ public class BatchController {
         batchRepository.save(batch);
         }
 
+// Helper class for autolocateBatch
+
 class ScoreObj {
         private final int position;
         private final int score;
         private final int amount;
         private final int rackId;
-        
+
+        // Constructor
         private ScoreObj(int position, int score, int amount, int rackId) {
             this.position = position;
             this.score = score;
@@ -171,6 +196,7 @@ class ScoreObj {
             this.rackId = rackId;
         }
 
+        // Getters
         private int getScore() {
             return score;
         }
@@ -188,6 +214,11 @@ class ScoreObj {
         }
 }
 
+    /**
+     * Suggests optimal locations for placing a batch based on predefined criteria.
+     * @param batchId ID of the batch
+     * @return Map of rack IDs to shelf positions and their respective suggested amounts
+     */
     @GetMapping("/Batch/{batchId}/Autolocate")
     @Operation(
             summary = "Calculate the optimal location(s) for a batch"
@@ -288,6 +319,12 @@ class ScoreObj {
         return batchesOnRacks;
     }
 
+    // Helper methods
+    /**
+     * Get all the harvest dates of batches on a shelf
+     * @param shelf The shelf to get the harvest dates from
+     * @return A set of all the harvest dates of batches on the shelf
+     */
     private Set<LocalDate> getHarvestDatesOnShelf(Shelf shelf) {
         Set<LocalDate> harvestDatesOnShelf = new HashSet<>();
         for (BatchLocation batchLocation : shelf.getBatchLocations()) {
@@ -295,7 +332,12 @@ class ScoreObj {
         }
         return harvestDatesOnShelf;
     }
-    
+
+    /**
+     * Get all the plant types on a shelf
+     * @param shelf The shelf to get the plant types from
+     * @return A set of all the plant types on the shelf
+     */
     private Set<PlantType> getPlantTypesOnShelf(Shelf shelf) {
         Set<PlantType> plantTypesOnShelf = new HashSet<>();
         for (BatchLocation batchLocation : shelf.getBatchLocations()) {
@@ -305,6 +347,11 @@ class ScoreObj {
         return plantTypesOnShelf;
     }
 
+    /**
+     * Check if a rack contains any batches
+     * @param rack The rack to check
+     * @return True if the rack contains any batches, false otherwise
+     */
     private boolean rackContainsBatches(Rack rack) {
         for (Shelf shelf : rack.getShelves()) {
             if (!shelf.getBatchLocations().isEmpty()) {
