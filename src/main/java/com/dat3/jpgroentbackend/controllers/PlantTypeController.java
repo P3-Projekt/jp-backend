@@ -37,15 +37,15 @@ public class PlantTypeController{
             @RequestBody CreatePlantTypeRequest request
     ) {
         //Check if name i not already used
-        if(plantTypeRepository.existsById(request.name)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
+        if(plantTypeRepository.existsById(request.getPlantTypeName())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + request.getPlantTypeName() + "' already exists"); //IdAlreadyExistInDB(name);
         }
 
         //Validate logic
-        if(request.growthTimeDays < request.preGerminationDays) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Growth time must be equal to or larger than germination time");
-        if(request.growthTimeDays < Arrays.stream(request.wateringSchedule).max().orElse(0)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It's not possible to have a watering schedule date higher than the growth time");
+        if(request.getGrowthTimeDays() < request.getPreGerminationDays()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Growth time must be equal to or larger than germination time");
+        if(request.getGrowthTimeDays() < Arrays.stream(request.getWateringSchedule()).max().orElse(0)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It's not possible to have a watering schedule date higher than the growth time");
 
-        PlantType plantType = new PlantType(request.name, request.preGerminationDays, request.growthTimeDays, request.preferredPosition, request.wateringSchedule);
+        PlantType plantType = new PlantType(request.getPlantTypeName(), request.getPreGerminationDays(), request.getGrowthTimeDays(), request.getPreferredPosition(), request.getWateringSchedule());
         return plantTypeRepository.save(plantType);
     }
 

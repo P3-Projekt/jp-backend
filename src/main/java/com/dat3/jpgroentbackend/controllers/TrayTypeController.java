@@ -37,9 +37,9 @@ public class TrayTypeController {
     ) {
 
         //Disallow creating tray type with already existing name
-        if(trayTypeRepository.existsById(request.name)) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
+        if(trayTypeRepository.existsById(request.getTrayTypeName())) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.getTrayTypeName() + "' already exists"); //IdAlreadyExistInDB(name);
 
-        TrayType trayType = new TrayType(request.name, request.widthCm, request.lengthCm);
+        TrayType trayType = new TrayType(request.getTrayTypeName(), request.getWidthCm(), request.getLengthCm());
 
         return trayTypeRepository.save(trayType);
     }

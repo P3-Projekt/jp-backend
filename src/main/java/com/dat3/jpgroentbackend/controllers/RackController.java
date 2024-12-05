@@ -45,7 +45,7 @@ public class RackController{
     public RackDto createRack(
             @RequestBody CreateRackRequest request
     ){
-        Rack rack = new Rack(request.xCoordinate, request.yCoordinate);
+        Rack rack = new Rack(request.getxCoordinate(), request.getyCoordinate());
         Rack savedRack = rackRepository.save(rack);
         return new RackDto(savedRack);
     }
@@ -72,7 +72,7 @@ public class RackController{
         //Get rack from database or throw exception if it does not exist
         Rack rack = rackRepository.findById(rackId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "No rack with id " + rackId + " was found"));
 
-        rack.setPosition(request.xCoordinate, request.yCoordinate);
+        rack.setPosition(request.getxCoordinate(), request.getyCoordinate());
         Rack savedRack = rackRepository.save(rack);
         return new RackDto(savedRack);
     }

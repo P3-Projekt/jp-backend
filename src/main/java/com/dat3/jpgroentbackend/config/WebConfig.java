@@ -38,13 +38,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+// This class is used to configure CORS for the application
+@Configuration // Configuration is used for Spring Bean configuration
 public class WebConfig implements WebMvcConfigurer {
-    @Override
+    @Override // Override is used to indicate that a method is meant to override a method in a superclass
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
+        registry.addMapping("/**") // Allow all paths
                 .allowedOrigins("http://localhost:3000") // Frontend URL
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow all HTTP methods
                 .allowedHeaders("*") // Allow all headers
                 .allowCredentials(true); // Allow cookies and credentials
     }

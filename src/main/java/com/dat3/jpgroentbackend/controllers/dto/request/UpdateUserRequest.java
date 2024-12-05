@@ -4,12 +4,29 @@ import com.dat3.jpgroentbackend.model.User;
 import jakarta.validation.constraints.Email;
 
 public class UpdateUserRequest {
-    public User.Role role;
+    private User.Role role;
 
-    public String telephone;
+    private String telephone;
 
     @Email(message = "Invalid email format")
-    public String email;
+    private String email;
 
-    public String address;
+    private String address;
+
+    // Getters
+    public User.Role getRole(){
+        return  role;
+    }
+
+    public String getTelephone(){
+        return telephone;
+    }
+
+    public String getEmail(){
+        return email;
+    }
+
+    public String getAddress(){
+        return address;
+    }
 }

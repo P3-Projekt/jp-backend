@@ -37,10 +37,10 @@ public class UserController {
             @RequestBody CreateUserRequest request
             ) {
             //Check if name i not already used
-            if(userRepository.existsById(request.name)){
-                throw new ResponseStatusException(HttpStatus.CONFLICT ,"A User with name '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
+            if(userRepository.existsById(request.getUsername())){
+                throw new ResponseStatusException(HttpStatus.CONFLICT ,"A User with name '" + request.getUsername() + "' already exists"); //IdAlreadyExistInDB(name);
             }
-        User user = new User(request.name, request.role, passwordEncoder.encode(request.password));
+        User user = new User(request.getUsername(), request.getRole(), passwordEncoder.encode(request.getPassword()));
             return userRepository.save(user);
     }
 
@@ -96,8 +96,8 @@ public class UserController {
         User user = userRepository.findById(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found"));
 
-        if (request.role != null) {
-            user.setRole(request.role);
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
         }
 
         return userRepository.save(user);

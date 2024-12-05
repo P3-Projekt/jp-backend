@@ -21,9 +21,12 @@ import com.dat3.jpgroentbackend.model.PlantType.PreferredPosition;
 import java.time.LocalDate;
 import java.util.*;
 
+// REST controller for managing batch-related operations
 @RestController
 @Tag(name = "Batch")
 public class BatchController {
+
+    // Dependencies are injected for accessing various repositories
     @Autowired
     private BatchRepository batchRepository;
     @Autowired
@@ -48,23 +51,24 @@ public class BatchController {
     )
     public BatchDto createBatch(
             @Valid
-            @RequestBody CreateBatchRequest request
+            @RequestBody CreateBatchRequest request // Validates request payload
             ) {
 
-        //Check valid parameters
-        PlantType plantType = plantTypeRepository.findById(request.plantTypeId)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "PlantType with id '" + request.plantTypeId + "' was not found"));
-        TrayType trayType = trayTypeRepository.findById(request.trayTypeId)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "TrayType with id '" + request.trayTypeId + "' was not found"));
-        User createdBy = userRepository.findById(request.createdByUsername)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + request.createdByUsername + "' was not found"));
+        // Fetch PlantType, TrayType, and User; throw error if not found
+        PlantType plantType = plantTypeRepository.findById(request.getPlantTypeId())
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "PlantType with id '" + request.getPlantTypeId() + "' was not found"));
+        TrayType trayType = trayTypeRepository.findById(request.getTrayTypeId())
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "TrayType with id '" + request.getTrayTypeId() + "' was not found"));
+        User createdBy = userRepository.findById(request.getCreatedByUsername())
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + request.getCreatedByUsername() + "' was not found"));
 
         //Create batch
-        Batch batch = new Batch(request.amount, plantType, trayType, createdBy);
+        Batch batch = new Batch(request.getAmount(), plantType, trayType, createdBy);
 
         //Save batch to database
         Batch batchSaved = batchRepository.save(batch);
 
+        // Return the saved batch as a DTO
         return new BatchDto(batchSaved);
     }
 
@@ -122,7 +126,7 @@ public class BatchController {
         // Check if the batch exists and get a batch object
         Batch batch = batchRepository.findById(batchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
         // Check if user exists
-        User user = userRepository.findById(request.username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
+        User user = userRepository.findById(request.getUsername()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
 
 
         // Get amount from empty batch location and remove it
@@ -133,12 +137,12 @@ public class BatchController {
         int batchAmount = emptyBatchLocation.amount;
 
         // Check if location amounts are complete
-        int locatedAmount = request.locations.values().stream().reduce(0, Integer::sum);
+        int locatedAmount = request.getLocations().values().stream().reduce(0, Integer::sum);
         if(batchAmount != locatedAmount) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Located amount was " + locatedAmount + " but batch contains " + batchAmount + " fields");
 
         // Create batchLocations with the values from the request body
         List<BatchLocation> batchLocations = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> location : request.locations.entrySet()) {
+        for (Map.Entry<Integer, Integer> location : request.getLocations().entrySet()) {
             int shelfId = location.getKey();
             int amount = location.getValue();
             Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Shelf with id '" + shelfId + "' was not found"));
