@@ -144,7 +144,7 @@ public class RackController{
         // Iterate through each shelf in the rack to collect batches
         for (Shelf shelf : rack.getShelves()){
             List<BatchLocation> batchLocations = batchLocationRepository.findByShelf(shelf);
-            List<Batch> batchesOnShelf = batchLocations.stream().map((location) -> location.batch).toList();
+            List<Batch> batchesOnShelf = batchLocations.stream().map((location) -> location.getBatch()).toList();
             batches.add(batchesOnShelf);
         }
         return batches;

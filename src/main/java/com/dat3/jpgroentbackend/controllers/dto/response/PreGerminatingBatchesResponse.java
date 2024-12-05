@@ -28,10 +28,10 @@ public class PreGerminatingBatchesResponse {
          * @param batch The Batch object to extract data from
          */
         public BatchResponse(Batch batch) {
-            this.batchId = batch.id;
+            this.batchId = batch.getId();
             this.amount = batch.getAmount();
-            this.plantName = batch.plantType.getName();
-            this.dueDate = batch.getPlantTask().dueDate;
+            this.plantName = batch.getPlantType().getName();
+            this.dueDate = batch.getPlantTask().getDueDate();
         }
 
         // Getters
@@ -66,7 +66,7 @@ public class PreGerminatingBatchesResponse {
      */
     public PreGerminatingBatchesResponse(List<Batch> preGerminatingBatches) {
         for(Batch batch : preGerminatingBatches) {
-            LocalDate plantDueDate = batch.getPlantTask().dueDate;
+            LocalDate plantDueDate = batch.getPlantTask().getDueDate();
             if(plantDueDate.isAfter(LocalDate.now())) {
                 needsMorePreGermination.add(new BatchResponse(batch));
             } else {

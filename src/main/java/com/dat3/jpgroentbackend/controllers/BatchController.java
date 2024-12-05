@@ -152,11 +152,11 @@ public class BatchController {
 
 
         // Get amount from empty batch location and remove it
-        if(batch.batchLocations.size() != 1 || batch.batchLocations.getFirst().shelf != null){
+        if(batch.getBatchLocations().size() != 1 || batch.getBatchLocations().getFirst().getShelf() != null){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Batch already has locations");
         }
-        BatchLocation emptyBatchLocation = batch.batchLocations.getFirst();
-        int batchAmount = emptyBatchLocation.amount;
+        BatchLocation emptyBatchLocation = batch.getBatchLocations().getFirst();
+        int batchAmount = emptyBatchLocation.getBatchAmount();
 
         // Check if location amounts are complete
         int locatedAmount = request.getLocations().values().stream().reduce(0, Integer::sum);
@@ -173,8 +173,8 @@ public class BatchController {
 
 
         // Populate batch with newly created locations
-        batch.batchLocations.clear();
-        batch.batchLocations.addAll(batchLocations);
+        batch.clearBatchLocations();
+        batch.addAllBatchLocations(batchLocations);
         //batch.
         batch.getPlantTask().complete(user);
         batchRepository.save(batch);
@@ -232,7 +232,7 @@ class ScoreObj {
         PreferredPosition preferredPosition = plantType.getPreferredPosition();
         
         // Throw an exception if the batch has already been placed
-        if (!batch.batchLocations.isEmpty()) {
+        if (!batch.getBatchLocations().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Batch has already been placed");
         }
         

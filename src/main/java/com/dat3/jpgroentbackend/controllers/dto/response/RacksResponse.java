@@ -53,9 +53,9 @@ public class RacksResponse {
                  * @param progress The progress of the task
                  */
                 public NextTaskResponse(Task task, double progress){
-                    this.id = task.id;
-                    this.category = task.category;
-                    this.dueDate = task.dueDate;
+                    this.id = task.getId();
+                    this.category = task.getCategory();
+                    this.dueDate = task.getDueDate();
                     this.progress = progress;
                 }
 
@@ -92,19 +92,19 @@ public class RacksResponse {
              */
             public BatchResponse(Batch batch) {
                 // Extract data from the batch
-                this.id = batch.id;
+                this.id = batch.getId();
                 this.amount = batch.getAmount();
-                this.tray = batch.trayType.getName();
-                this.plant = batch.plantType.getName();
-                this.createdBy = batch.createdBy.getName();
-                this.harvestDate = batch.getHarvestingTask().dueDate;
+                this.tray = batch.getTrayType().getName();
+                this.plant = batch.getPlantType().getName();
+                this.createdBy = batch.getCreatedBy().getName();
+                this.harvestDate = batch.getHarvestingTask().getDueDate();
 
                 // Calculate the progress of the next task
                 Task nextTask = batch.getNextTask(); // Get the next task
                 LocalDate latestTaskCompletion = batch.getLatestCompletedTaskDate(); // Get the date of the latest task completion
                 long lastCompletionEpoch = latestTaskCompletion.toEpochDay(); // Convert the date to an epoch day, for easier comparison
                 long nowEpoch = LocalDate.now().toEpochDay(); // Get the current date as an epoch day
-                long nextTaskEpoch = nextTask.dueDate.toEpochDay(); // Get the due date of the next task as an epoch day
+                long nextTaskEpoch = nextTask.getDueDate().toEpochDay(); // Get the due date of the next task as an epoch day
 
                 // Calculate the progression of the next task
                 double nextTaskProgression = ((double) nowEpoch - lastCompletionEpoch + 1) / (nextTaskEpoch - lastCompletionEpoch + 1);
@@ -151,7 +151,7 @@ public class RacksResponse {
             this.id = shelf.getId();
             // Add each batch on the shelf to the list of batches
             shelf.getBatchLocations().stream()
-                    .map(batchLocation -> batchLocation.batch)
+                    .map(batchLocation -> batchLocation.getBatch())
                     .forEach(batch -> this.batches.add(new BatchResponse(batch)));
         }
 

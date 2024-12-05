@@ -3,7 +3,8 @@ package com.dat3.jpgroentbackend.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-@Entity
+// Represents a user in the system
+@Entity // Marks this class as an entity that maps to a database table
 public class User {
 
     public enum Role{
@@ -18,6 +19,7 @@ public class User {
     private boolean active = true;
     private String password;
 
+    // Default constructor for storing in the database
     public User(){}
     public User(String name, Role role, String password){
         this.name = name;
@@ -25,6 +27,7 @@ public class User {
         this.password = password;
     }
 
+    // Getters and setters
     public String getName() {
         return name;
     }

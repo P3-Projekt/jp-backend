@@ -67,14 +67,16 @@ public class Rack {
 
             //Calculate occupied area
             int occupiedArea = shelf.getBatchLocations().stream().map(location -> {
-                int amount = location.amount;
-                int width = location.batch.trayType.getWidthCm();
-                int length = location.batch.trayType.getLengthCm();
+                int amount = location.getBatchAmount();
+                int width = location.getBatch().getTrayType().getWidthCm();
+                int length = location.getBatch().getTrayType().getLengthCm();
                 return amount * width * length;
             }).reduce(0, Integer::sum);
 
-            int batchArea = batch.trayType.getWidthCm() * batch.batchLocations.size();
+            // Calculate the area required for the given batch
+            int batchArea = batch.getTrayType().getWidthCm() * batch.getBatchLocations().size();
 
+            // Calculate the maximum amount of the batch that can fit on the shelf
             int maxAmountOfBatchOnShelf = (shelfArea - occupiedArea)/batchArea;
             maxAmountOnShelves.add(maxAmountOfBatchOnShelf);
         }

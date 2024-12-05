@@ -9,13 +9,13 @@ public class BatchLocation {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     public int id;
 
-    public int amount;
+    private int amount;
 
     @ManyToOne
-    public Batch batch;
+    private Batch batch;
 
     @ManyToOne
-    public Shelf shelf;
+    private Shelf shelf;
 
     public BatchLocation() {}
     public BatchLocation(Batch batch, Shelf shelf, int amount) {
@@ -26,5 +26,9 @@ public class BatchLocation {
 
     public Batch getBatch() {
         return batch;
+    }
+
+    public Shelf getShelf() {
+        return shelf;
     }
 }

@@ -20,8 +20,10 @@ public class TrayType {
         this.widthCm = widthCm;
     }
 
+    // Default constructor for storing in the database
     public TrayType() {}
 
+    // getters
     public String getName() {
         return name;
     }

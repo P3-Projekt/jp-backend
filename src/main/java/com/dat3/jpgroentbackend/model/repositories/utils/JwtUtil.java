@@ -8,42 +8,36 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.function.Function;
 
-/**
- * Utility-klasse til håndtering af JWT (JSON Web Token).
- * Indeholder metoder til at generere, validere og udtrække data fra tokens.
- */
+// Utility class for handling JWT (JSON Web Token)
+// operations such as generating, validating, and extracting data.
 @Component
 public class JwtUtil {
-    // Nøgle brugt til at signere og verificere tokens.
-    private final String SECRET_KEY = "test";
+    private final String SECRET_KEY = "test"; // Secret key for signing and validating tokens
 
     /**
-     *  Finder username fra et token
-     *
-     * @param token JWT
-     * @return Brugernavnet (subject) fra token
+     * Extracts the username (subject) from a token.
+     * @param token JWT token.
+     * @return Username from the token.
      */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     /**
-     * Udtrækker udløbsdatoen fra en token
-     *
-     * @param token JWT
-     * @return Udløbsdatoen for tokenet
+     * Extracts the expiration date from a token.
+     * @param token JWT token.
+     * @return Expiration date.
      */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
     /**
-     * udtrækker et specifikt claim fra en token
-     *
-     * @param token JWT
-     * @param claimsResolver Funktion, der specifere hvilken claim der skal udtrækkes
-     * @param <T> typen af claim der udtrækkes
-     * @return værdien af den øsnkede claim
+     * Extracts a specific claim from a token.
+     * @param token JWT token.
+     * @param claimsResolver Function to specify which claim to extract.
+     * @param <T> Type of the claim.
+     * @return Value of the requested claim.
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -51,20 +45,18 @@ public class JwtUtil {
     }
 
     /**
-     * Udtrækker alle claims fra et token.
-     *
-     * @param token JWT-token.
-     * @return Et Claims-objekt, der indeholder alle claims i tokenet.
+     * Extracts all claims from a token.
+     * @param token JWT token.
+     * @return Claims object containing all claims.
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody() ;
     }
 
     /**
-     * Genererer et token baseret på et brugernavn.
-     *
-     * @param subject Brugernavn (eller en anden identifikator) til token.
-     * @return Et nyt JWT-token, der er gyldigt i 24 timer.
+     * Generates a JWT token for a username, valid for 24 hours.
+     * @param subject Username or identifier.
+     * @return New JWT token.
      */
     private String createToken(String subject) {
         return Jwts.builder()
@@ -78,11 +70,10 @@ public class JwtUtil {
     }
 
     /**
-     * Validerer et token mod et brugernavn.
-     *
-     * @param token    JWT-token.
-     * @param username Brugernavnet der skal sammenlignes med tokenets subject.
-     * @return True hvis tokenet er gyldigt og tilhører brugeren, ellers False.
+     * Validates a token against a username.
+     * @param token JWT token.
+     * @param username Username to compare with token's subject.
+     * @return True if valid, otherwise False.
      */
     public Boolean validateToken(String token, String username) {
         final String tokenUsername = extractUsername(token);
@@ -90,9 +81,9 @@ public class JwtUtil {
     }
 
     /**
-     * Generere en token
-     * @param username brugernavnet der skal laves en token med
-     * @return den nye token
+     * Generates a token for a given username.
+     * @param username Username to associate with the token.
+     * @return Generated token.
      */
     public String generateToken(String username) {
         return createToken(username);

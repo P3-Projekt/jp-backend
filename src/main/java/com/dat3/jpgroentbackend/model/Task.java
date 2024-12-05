@@ -15,19 +15,20 @@ public class Task {
     }
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    public int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public Category category;
-    public LocalDate dueDate;
+    private Category category;
+
+    private LocalDate dueDate;
 
     @ManyToOne
-    public User completedBy;
+    private User completedBy;
 
     @ManyToOne
     private Batch batch;
 
-    public LocalDateTime completedAt;
+    private LocalDateTime completedAt;
 
     public Task(){}
     public Task(Category category, LocalDate dueDate, Batch batch) {
@@ -45,6 +46,23 @@ public class Task {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int dueDateWeekNumber = this.dueDate.get(weekFields.weekOfWeekBasedYear());
         return dueDateWeekNumber == weekNumber;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public User getCompletedBy() {
+        return completedBy;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
     }
 
     public Batch getBatch() {

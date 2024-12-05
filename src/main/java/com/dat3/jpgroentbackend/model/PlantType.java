@@ -34,6 +34,7 @@ public class PlantType {
 
     public PlantType() {}
 
+    // Getters for the PlantType properties
     public String getName() {
         return name;
     }

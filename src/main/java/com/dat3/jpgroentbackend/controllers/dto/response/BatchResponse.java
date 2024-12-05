@@ -24,13 +24,13 @@ public class BatchResponse {
      * @param batch Source Batch object
      */
     public BatchResponse(Batch batch) {
-        this.plantName = batch.plantType.getName();
-        this.trayName = batch.trayType.getName();
-        this.creationDate = batch.getPlantTask().dueDate.minusDays(batch.plantType.getPreGerminationDays());
-        this.harvestDate = batch.getHarvestingTask().dueDate;
-        this.createdBy = batch.createdBy.getName();
-        this.amount = batch.batchLocations.stream().map(batchLocation -> batchLocation.amount).reduce(0, Integer::sum);
-        this.batchId = batch.id;
+        this.plantName = batch.getPlantType().getName();
+        this.trayName = batch.getTrayType().getName();
+        this.creationDate = batch.getPlantTask().getDueDate().minusDays(batch.getPlantType().getPreGerminationDays());
+        this.harvestDate = batch.getHarvestingTask().getDueDate();
+        this.createdBy = batch.getCreatedBy().getName();
+        this.amount = batch.getBatchLocations().stream().map(batchLocation -> batchLocation.getBatchAmount()).reduce(0, Integer::sum);
+        this.batchId = batch.getId();
     }
 
     // Getters

@@ -30,6 +30,7 @@ public class Shelf {
         this.position = position;
     }
 
+    // Getters
     public int getId() {
         return id;
     }

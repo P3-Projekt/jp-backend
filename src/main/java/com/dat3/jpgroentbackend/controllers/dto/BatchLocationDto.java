@@ -17,8 +17,8 @@ public class BatchLocationDto {
      * @param batchLocation The BatchLocation object containing the data to populate this DTO.
      */
     public BatchLocationDto(BatchLocation batchLocation) {
-        this.shelfId = batchLocation.id;
-        this.amount = batchLocation.amount;
-        this.batchId = batchLocation.batch.id;
+        this.shelfId = batchLocation.getId();
+        this.amount = batchLocation.getBatchAmount();
+        this.batchId = batchLocation.getBatch().getId();
     }
 }

@@ -10,25 +10,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+// Represents a batch of plants, including tasks related to planting, watering, and harvesting.
 @Entity
 public class Batch {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    public int id;
+    private int id;
 
     @ManyToOne
-    public PlantType plantType;
+    private PlantType plantType;
 
     @ManyToOne
-    public TrayType trayType;
+    private TrayType trayType;
 
-    public LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne
-    public User createdBy;
+    private User createdBy;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    public final List<BatchLocation> batchLocations = new ArrayList<>();
+    private final List<BatchLocation> batchLocations = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Task> wateringTasks = new ArrayList<>();
@@ -63,24 +65,26 @@ public class Batch {
         this.harvestingTask = new Task(Task.Category.Harvest, harvestDueDate, this);
     }
 
+    // Returns the next task that needs to be completed based on priority (plant, water, harvest).
     public Task getNextTask(){
         //Return pre-germination task if it hasn't been completed
-        if(this.plantTask.completedAt == null) return this.plantTask;
+        if(this.plantTask.getCompletedAt() == null) return this.plantTask;
 
         //Construct a list of all tasks except planting
         List<Task> locationTasks = new ArrayList<>(this.wateringTasks);
         locationTasks.add(this.harvestingTask);
 
         //Filter away completed tasks
-        List<Task> incompleteLocationTasks = locationTasks.stream().filter(task -> task.completedAt == null).toList();
+        List<Task> incompleteLocationTasks = locationTasks.stream().filter(task -> task.getCompletedAt() == null).toList();
         if(incompleteLocationTasks.isEmpty()){return null;}
 
-        //Find most relevant task
+        // Find the next task with the earliest due date, prioritize watering tasks
+
         Task nextTask = incompleteLocationTasks.getFirst();
         for(Task task : incompleteLocationTasks){
-            boolean isNewFirst = task.dueDate.isBefore(nextTask.dueDate);
-            boolean isNoneFirst = task.dueDate.isEqual(nextTask.dueDate);
-            boolean isWatering = task.category == Task.Category.Water;
+            boolean isNewFirst = task.getDueDate().isBefore(nextTask.getDueDate());
+            boolean isNoneFirst = task.getDueDate().isEqual(nextTask.getDueDate());
+            boolean isWatering = task.getCategory() == Task.Category.Water;
             //Prioritize tasks that are closer to be completed, then prioritize watering
             if(isNewFirst || (isNoneFirst && isWatering)){
                 nextTask = task;
@@ -90,10 +94,12 @@ public class Batch {
 
     }
 
-
+    /**
+     * Returns the date of the latest completed task.
+     */
     public LocalDate getLatestCompletedTaskDate(){
         LocalDateTime latestCompletesTaskTime = getTasks().stream()
-                .map(task -> task.completedAt)
+                .map(task -> task.getCompletedAt())
                 .filter(Objects::nonNull)
                 .max(LocalDateTime::compareTo)
                 .orElse(null);
@@ -105,7 +111,9 @@ public class Batch {
     }
 
 
-
+    /**
+     * Returns all tasks associated with this batch.
+     */
     public List<Task> getTasks(){
         List<Task> tasks = new ArrayList<>();
 
@@ -116,21 +124,73 @@ public class Batch {
         return tasks;
     }
 
+    /**
+     * Returns the total amount of items in all batch locations.
+     */
     public int getAmount(){
-        return this.batchLocations.stream().map(batchLocation -> batchLocation.amount).reduce(0, Integer::sum);
+
+
+        return this.batchLocations.stream().map(batchLocation -> batchLocation.getBatchAmount()).reduce(0, Integer::sum);
     }
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public PlantType getPlantType() {
         return plantType;
     }
 
-    public Task getPlantTask() {
-        return plantTask;
+
+
+    public TrayType getTrayType() {
+        return trayType;
     }
+
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+
+
+    public List<BatchLocation> getBatchLocations() {
+        return batchLocations;
+    }
+
+    public void clearBatchLocations() {
+        this.batchLocations.clear();
+    }
+
+    public void addAllBatchLocations(List<BatchLocation> batchLocations) {
+        this.batchLocations.addAll(batchLocations);
+    }
+
+
 
     public Task getHarvestingTask() {
         return harvestingTask;
     }
 
+
+
+    public Task getPlantTask() {
+        return plantTask;
+    }
+
+
+
+    // Helper methods
     public static List<Task> getTasks(List<Batch> batches, Integer weekDayFilter){
         List<Task> tasks = new ArrayList<>();
         for (Batch batch : batches) {
@@ -145,7 +205,8 @@ public class Batch {
         return tasks;
     }
 
+
     public static List<Batch> filterPreGerminatingBatches(List<Batch> batches){
-        return batches.stream().filter(batch -> batch.plantTask.completedAt == null).toList();
+        return batches.stream().filter(batch -> batch.plantTask.getCompletedAt() == null).toList();
     }
 }

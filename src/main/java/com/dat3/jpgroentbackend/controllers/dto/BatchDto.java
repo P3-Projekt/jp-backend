@@ -18,10 +18,10 @@ public class BatchDto {
      * @param batch The Batch object containing the data to populate this DTO.
      */
     public BatchDto(Batch batch) {
-        this.batchId = batch.id;
-        this.plantTypeId = batch.plantType.getName();
-        this.trayTypeId = batch.trayType.getName();
-        this.createdAt = batch.createdAt.toString(); // Converts creation date to a string
-        this.createdBy = batch.createdBy.getName();
+        this.batchId = batch.getId();
+        this.plantTypeId = batch.getPlantType().getName();
+        this.trayTypeId = batch.getTrayType().getName();
+        this.createdAt = batch.getCreatedAt().toString(); // Converts creation date to a string
+        this.createdBy = batch.getCreatedBy().getName();
     }
 }
