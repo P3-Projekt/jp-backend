@@ -2,8 +2,10 @@ package com.dat3.jpgroentbackend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "\"user\"")
 public class User {
 
     public enum Role{
@@ -14,6 +16,7 @@ public class User {
 
     @Id
     private String name;
+
     private Role role;
     private boolean active = true;
     private String password;

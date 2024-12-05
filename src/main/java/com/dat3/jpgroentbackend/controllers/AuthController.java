@@ -17,7 +17,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestBody AuthRequest authRequest) throws Exception {
-        System.out.println("test");
         return authenticationService.authenticate(authRequest.getUsername(), authRequest.getPassword());
     }
 }
