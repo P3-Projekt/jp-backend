@@ -57,4 +57,17 @@ public class Shelf {
     public void removeBatchLocation(BatchLocation batchLocation) {
         batchLocations.remove(batchLocation);
     }
+
+    public int getTotalArea() {
+        return length * width;
+    }
+
+    public int getOccupiedArea() {
+        return getBatchLocations().stream().map(location -> {
+            int amount = location.getAmount();
+            int width = location.getBatch().getTrayType().getWidthCm();
+            int length = location.getBatch().getTrayType().getLengthCm();
+            return amount * width * length;
+        }).reduce(0, Integer::sum);
+    }
 }

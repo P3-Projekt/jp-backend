@@ -27,4 +27,8 @@ public class BatchLocation {
     public Batch getBatch() {
         return batch;
     }
+
+    public int getAmount() {
+        return amount;
+    }
 }

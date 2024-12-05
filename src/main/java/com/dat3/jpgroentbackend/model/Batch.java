@@ -123,6 +123,10 @@ public class Batch {
         return plantType;
     }
 
+    public TrayType getTrayType() {
+        return trayType;
+    }
+
     public Task getPlantTask() {
         return plantTask;
     }

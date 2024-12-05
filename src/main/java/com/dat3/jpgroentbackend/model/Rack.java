@@ -36,7 +36,7 @@ public class Rack {
     }
 
     public List<Shelf> getShelves() {
-        if (shelves != null) {
+        if (!shelves.isEmpty()) {
             return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
         }
         return null;
@@ -63,21 +63,33 @@ public class Rack {
     public List<Integer> getMaxAmountOnShelves(Batch batch) {
         List<Integer> maxAmountOnShelves = new ArrayList<>();
         for(Shelf shelf : shelves) {
-            int shelfArea = Shelf.length * Shelf.width;
+            int shelfTotalArea = shelf.getTotalArea();
 
             //Calculate occupied area
-            int occupiedArea = shelf.getBatchLocations().stream().map(location -> {
-                int amount = location.amount;
-                int width = location.batch.trayType.getWidthCm();
-                int length = location.batch.trayType.getLengthCm();
-                return amount * width * length;
-            }).reduce(0, Integer::sum);
+            int occupiedArea = shelf.getOccupiedArea();
 
             int batchArea = batch.trayType.getWidthCm() * batch.batchLocations.size();
 
-            int maxAmountOfBatchOnShelf = (shelfArea - occupiedArea)/batchArea;
+            int maxAmountOfBatchOnShelf = (shelfTotalArea - occupiedArea)/batchArea;
             maxAmountOnShelves.add(maxAmountOfBatchOnShelf);
         }
         return maxAmountOnShelves;
+    }
+
+    public int getTotalBatches() {
+        return shelves.stream()
+                .flatMap(shelf -> shelf.getBatchLocations().stream()) // Flatten all BatchLocations from all shelves
+                .mapToInt(BatchLocation::getAmount) // Map to their amounts
+                .sum(); // Sum them up
+    }
+
+    public int getPercentageFilled() {
+        int numShelves = shelves.size();
+        float rackFilledPercentage = 0;
+        for (Shelf shelf : shelves) {
+            float shelfFilledPercentage = (float)shelf.getOccupiedArea() / shelf.getTotalArea();
+            rackFilledPercentage += (shelfFilledPercentage * 100) / numShelves;
+        }
+        return Math.round(rackFilledPercentage);
     }
 }
