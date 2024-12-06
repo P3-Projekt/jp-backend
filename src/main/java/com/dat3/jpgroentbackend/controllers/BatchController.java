@@ -109,15 +109,24 @@ public class BatchController {
         return new MaxAmountOnShelvesResponse(maxAmountOnShelvesByRack).getMaxAmountOnShelves();
     }
 
+    private void printMap(Map<Integer, Integer> nestedMap) {
+        for (Map.Entry<Integer, Integer> entry :  nestedMap.entrySet()) {
+            System.out.println(entry.getKey()+ ":" + entry.getValue());
+        }
+    }
+
     @PutMapping("/Batch/{batchId}/Position")
     @Operation(
             summary = "Update the position of a batch"
     )
         public void updateBatchPosition(
             @PathVariable int batchId,
-            @Valid
+            //@Valid
             @RequestBody UpdateBatchLocationRequest request
             ){
+
+        System.out.println("Updating batch positions");
+        printMap(request.locations);
 
         // Check if the batch exists and get a batch object
         Batch batch = batchRepository.findById(batchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "A batch with id '" + batchId + "' does not exist"));
