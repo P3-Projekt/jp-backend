@@ -7,31 +7,45 @@ import jakarta.persistence.Id;
 
 import java.util.Arrays;
 
+
+// Represents the plant type and its growth-related attributes.
 @Entity
 public class PlantType {
 
+    // Enum to define the preferred position of the plant for optimal growth.
     public enum PreferredPosition {
         Low,
         High,
         NoPreferred
     }
 
-    @Id
+    @Id // Specifies the primary key for the entity
     private String name;
     private int preGerminationDays;
     private int growthTimeDays;
     private PreferredPosition preferredPosition;
+    // Custom converter to store and retrieve int arrays as JSON in the database
     @Convert(converter = IntArrayToJsonConverter.class)
     private int[] wateringSchedule;
 
+    /**
+     * Constructor to initialize a PlantType object.
+     * @param name               The name of the plant type.
+     * @param preGerminationDays Days required for pre-germination.
+     * @param growthTimeDays     Total growth time in days.
+     * @param preferredPosition  The preferred position of the plant.
+     * @param wateringSchedule   The watering schedule as an array of integers (e.g., days of the week).
+     */
     public PlantType(String name, int preGerminationDays, int growthTimeDays, PreferredPosition preferredPosition, int[] wateringSchedule) {
         this.name = name;
         this.preGerminationDays = preGerminationDays;
         this.growthTimeDays = growthTimeDays;
         this.preferredPosition = preferredPosition;
+        // Ensures the watering schedule is unique and sorted for consistency
         this.wateringSchedule = Arrays.stream(wateringSchedule).distinct().sorted().toArray();
     }
 
+    // Default constructor for storing in the database
     public PlantType() {}
 
     // Getters for the PlantType properties
