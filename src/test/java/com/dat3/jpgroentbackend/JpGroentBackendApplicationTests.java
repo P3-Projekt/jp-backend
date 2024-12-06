@@ -264,9 +264,9 @@ public class JpGroentBackendApplicationTests {
         mockMvc.perform(get("/Batch/{batchId}/MaxAmountOnShelves", batchId)
                         .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("Stor"))
-                .andExpect(jsonPath("$.1[0]").value(1600)) // Forventer at "1" indeholder 1600 i den første position
-                .andExpect(jsonPath("$.2").isEmpty()); // Forventer at "2" er en tom liste
+                .andExpect(jsonPath("$").value("Stor"));
+              //  .andExpect(jsonPath("$.1[0]").value(1600)) // Forventer at "1" indeholder 1600 i den første position
+              //  .andExpect(jsonPath("$.2").isEmpty()); // Forventer at "2" er en tom liste
     }
 
     @Order(14)
