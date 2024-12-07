@@ -95,17 +95,9 @@ public class Rack {
         List<Integer> maxAmountOnShelves = new ArrayList<>();
         for(Shelf shelf : getShelves()) {
             int max = shelf.getMaxAmountOfBatch(batch);
-            // System.out.printf("\nMax amount on shelf with position %d on rack %d is %d", shelf.getPosition(), shelf.getRack().getId(), max);
             maxAmountOnShelves.add(max);
         }
         return maxAmountOnShelves.reversed();
-    }
-
-    public int getTotalBatches() {
-        return shelves.stream()
-                .flatMap(shelf -> shelf.getBatchLocations().stream()) // Flatten all BatchLocations from all shelves
-                .mapToInt(BatchLocation::getBatchAmount) // Map to their amounts
-                .sum(); // Sum them up
     }
 
     public int getPercentageFilled() {

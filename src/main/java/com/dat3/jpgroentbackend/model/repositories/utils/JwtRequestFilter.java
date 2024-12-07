@@ -30,8 +30,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        System.out.println("Request Method: " + request.getMethod()); // Log request method for debugging
-
         // Allow OPTIONS requests without further processing
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK); // Returner status 200 for OPTIONS-anmodninger
@@ -48,7 +46,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtil.extractUsername(jwt); // Extract username from JWT
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT token expired");
+                throw new RuntimeException("JWT token expired");
             }
         }
 

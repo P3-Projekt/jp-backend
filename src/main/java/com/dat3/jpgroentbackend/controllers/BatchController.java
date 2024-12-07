@@ -232,7 +232,6 @@ public class BatchController {
         
         // Throw an exception if the batch has already been placed
         if (batch.getBatchLocations().size() != 1 && batch.getBatchLocations().getFirst().getShelf() != null) {
-            System.out.println("Batch is already placed");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Batch has already been placed");
         }
         
@@ -366,19 +365,5 @@ public class BatchController {
             }
         }
         return false;
-    }
-
-    private Rack getStartingRack () {
-        int highestPercentage = 0;
-        List<Rack> racks = rackRepository.findAll();
-        Rack startingRack = racks.getFirst();
-        for (Rack rack : racks) {
-            int percentage = rack.getPercentageFilled();
-            if (percentage > highestPercentage) {
-                startingRack = rack;
-                highestPercentage = percentage;
-            }
-        }
-        return startingRack;
     }
 }

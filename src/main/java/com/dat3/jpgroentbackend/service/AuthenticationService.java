@@ -31,12 +31,10 @@ public class AuthenticationService {
      */
     public String authenticate(String username, String password) throws Exception {
         try {
-            System.out.println("Attempting authentication for username: " + username);
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
         } catch (Exception e) {
-            System.out.println("Authentication failed for username: " + username);
             throw new Exception("Incorrect username or password", e);
         }
 

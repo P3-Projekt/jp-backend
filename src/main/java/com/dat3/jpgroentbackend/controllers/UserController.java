@@ -1,5 +1,6 @@
 package com.dat3.jpgroentbackend.controllers;
 
+import com.dat3.jpgroentbackend.controllers.dto.UserDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateUserRequest;
 import com.dat3.jpgroentbackend.controllers.dto.request.UpdateUserRequest;
 import com.dat3.jpgroentbackend.model.User;
@@ -16,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // REST controller for managing user entities.
 @RestController
@@ -69,9 +73,12 @@ public class UserController {
             }
     )
 
-    public Iterable<User> getAllUsers() {
-        // Return all users from the repository.
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+
+        List<UserDto> users = new ArrayList<>();
+        userRepository.findAll().forEach(u -> users.add(new UserDto(u)));
+        // Return all users without passwords.
+        return users;
     }
 
     /**

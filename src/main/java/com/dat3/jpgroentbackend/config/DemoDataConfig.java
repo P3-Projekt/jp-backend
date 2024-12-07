@@ -33,11 +33,11 @@ public class DemoDataConfig {
     public CommandLineRunner demoData() {
         return args -> {
             // Check if user already exists
-            if (!userRepository.findByName("demo").isPresent()) {
+            if (userRepository.findByName("demo").isEmpty()) {
                 // Create and save the demo user
                 User demoUser = new User();
-                demoUser.setName("demo");
-                demoUser.setPassword(passwordEncoder.encode("12345")); // Use a simple password for testing
+                demoUser.setName("Jens");
+                demoUser.setPassword(passwordEncoder.encode("Jens9876")); // Use a simple password for testing
                 demoUser.setRole(User.Role.Administrator); // Set the role as needed
                 demoUser.setActive(true); // Set the user as active
 
