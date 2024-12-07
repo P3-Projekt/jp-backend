@@ -2,9 +2,11 @@ package com.dat3.jpgroentbackend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 // Represents a user in the system
 @Entity // Marks this class as an entity that maps to a database table
+@Table(name = "\"user\"")
 public class User {
     // Enum to define the role of a user in the system
     public enum Role{
@@ -72,4 +74,6 @@ public class User {
     public void setActive() {
         active = true;
     }
+
+
 }
