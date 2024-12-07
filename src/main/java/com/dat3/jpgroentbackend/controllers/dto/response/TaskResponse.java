@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 
 // A response DTO for representing a task and its associated details.
 public class TaskResponse{
-    private final int batchId;
-    private final int taskId;
-    private final String plantType;
-    private final int fields;
-    private final LocalDate dueDate;
-    private final Task.Category category;
-    private final LocalDateTime completedAt;
-    private String completedBy;
+    public final int batchId;
+    public final int taskId;
+    public final String plantType;
+    public final int fields;
+    public final LocalDate dueDate;
+    public final Task.Category category;
+    public final LocalDateTime completedAt;
+    public String completedBy;
 
     /**
      * Constructs a TaskResponse based on a Task object.
@@ -34,38 +34,5 @@ public class TaskResponse{
         if(task.getCompletedBy() != null) {
             this.completedBy = task.getCompletedBy().getName();
         }
-    }
-
-    // Getters
-    public int getBatchId() {
-        return batchId;
-    }
-
-    public String getPlantType() {
-        return plantType;
-    }
-
-    public int getFields() {
-        return fields;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public Task.Category getCategory() {
-        return category;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public String getCompletedBy() {
-        return completedBy;
-    }
-
-    public int getTaskId() {
-        return taskId;
     }
 }

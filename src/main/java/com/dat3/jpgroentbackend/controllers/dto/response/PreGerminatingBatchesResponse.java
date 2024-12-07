@@ -16,10 +16,10 @@ public class PreGerminatingBatchesResponse {
 
     // Inner class representing a simplified view of a batch.
     public static class BatchResponse {
-        private final int batchId; // Unique identifier for the batch
-        private final int amount; // Total amount in the batch
-        private final String plantName; // Name of the plant type in the batch
-        private final LocalDate dueDate; // Due date for the batch's next task
+        public final int batchId; // Unique identifier for the batch
+        public final int amount; // Total amount in the batch
+        public final String plantName; // Name of the plant type in the batch
+        public final LocalDate dueDate; // Due date for the batch's next task
 
         /**
          * Constructs a BatchResponse from a Batch object.
@@ -52,10 +52,10 @@ public class PreGerminatingBatchesResponse {
     }
 
     // List of batches that still need more pre-germination time
-    private final List<BatchResponse> needsMorePreGermination = new ArrayList<>();
+    public final List<BatchResponse> needsMorePreGermination = new ArrayList<>();
 
     // List of batches that are ready to be placed elsewhere
-    private final List<BatchResponse> canBePlaced = new ArrayList<>();
+    public final List<BatchResponse> canBePlaced = new ArrayList<>();
 
     /**
      * Constructs a PreGerminatingBatchesResponse by categorizing batches
@@ -72,14 +72,5 @@ public class PreGerminatingBatchesResponse {
                 canBePlaced.add(new BatchResponse(batch));
             }
         }
-    }
-
-    // getters
-    public List<BatchResponse> getNeedsMorePreGermination() {
-        return needsMorePreGermination;
-    }
-
-    public List<BatchResponse> getCanBePlaced() {
-        return canBePlaced;
     }
 }

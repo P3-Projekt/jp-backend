@@ -10,7 +10,7 @@ import java.util.Map;
 public class MaxAmountOnShelvesResponse {
 
     // Stores the maximum amount of items per shelf for each rack ID
-    private final Map<Integer, List<Integer>> maxAmountOnShelves = new HashMap<>();
+    public final Map<Integer, List<Integer>> maxAmountOnShelves = new HashMap<>();
 
     /**
      * Constructs a MaxAmountOnShelvesResponse by transforming a map keyed by Rack objects
@@ -24,10 +24,4 @@ public class MaxAmountOnShelvesResponse {
             maxAmountOnShelves.put(entry.getKey().getId(), entry.getValue());
         }
     }
-
-    // Getters
-    public Map<Integer, List<Integer>> getMaxAmountOnShelves() {
-        return maxAmountOnShelves;
-    }
-
 }

@@ -6,26 +6,13 @@ import jakarta.validation.constraints.NotNull;
 // This class represents a request to create a new tray type.
 public class CreateTrayTypeRequest {
     @NotNull
-    private String trayTypeName;
+    public String name;
 
     @NotNull
     @Min(0)
-    private Integer widthCm;
+    public Integer widthCm;
 
     @NotNull
     @Min(0)
-    private Integer lengthCm;
-
-    // Getters
-    public String getTrayTypeName() {
-        return trayTypeName;
-    }
-
-    public Integer getWidthCm() {
-        return widthCm;
-    }
-
-    public Integer getLengthCm() {
-        return lengthCm;
-    }
+    public Integer lengthCm;
 }

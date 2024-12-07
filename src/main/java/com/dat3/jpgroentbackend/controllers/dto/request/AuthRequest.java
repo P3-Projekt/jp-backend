@@ -7,16 +7,6 @@ package com.dat3.jpgroentbackend.controllers.dto.request;
 public class AuthRequest {
 
     // The username and password of the user attempting to authenticate
-    private String username;
-    private String password;
-
-    // Getter for the username
-    public String getUsername() {
-        return username;
-    }
-
-    // Getter for password
-    public String getPassword() {
-        return password;
-    }
+    public String username;
+    public String password;
 }

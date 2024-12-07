@@ -43,15 +43,15 @@ public class UserController {
             @RequestBody CreateUserRequest request // Validates the request body.
     ) {
             // Check if a user with the given username already exists.
-            if(userRepository.existsById(request.getUsername())) {
+            if(userRepository.existsById(request.name)) {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT ,
-                        "A User with name '" + request.getUsername() + "' already exists"
+                        "A User with name '" + request.name + "' already exists"
                 );
             }
 
         // Create a new User entity with encoded password.
-        User user = new User(request.getUsername(), request.getRole(), passwordEncoder.encode(request.getPassword()));
+        User user = new User(request.name, request.role, passwordEncoder.encode(request.password));
 
         // Save the user to the repository and return the created entity.
         return userRepository.save(user);
@@ -149,8 +149,8 @@ public class UserController {
                 );
 
         // Update the user's role if provided in the request.
-        if (request.getRole() != null) {
-            user.setRole(request.getRole());
+        if (request.role != null) {
+            user.setRole(request.role);
         }
 
         // Save the updated user entity and return it.

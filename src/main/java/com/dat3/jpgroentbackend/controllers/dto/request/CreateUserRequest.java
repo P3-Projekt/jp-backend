@@ -6,24 +6,11 @@ import jakarta.validation.constraints.NotNull;
 
 public class CreateUserRequest {
     @NotBlank
-    private String username;
+    public String name;
 
     @NotNull
-    private User.Role role;
+    public User.Role role;
 
     @NotNull
-    private String password;
-
-    // Getters
-    public String getUsername() {
-        return username;
-    }
-
-    public User.Role getRole() {
-        return role;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+    public String password;
 }

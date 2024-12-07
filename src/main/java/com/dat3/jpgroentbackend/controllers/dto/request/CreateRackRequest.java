@@ -7,18 +7,9 @@ import jakarta.validation.constraints.NotNull;
 public class CreateRackRequest {
     @NotNull // The rack name cannot be null
     @Min(0) // The value must be at least 0
-    private Integer xCoordinate; // xCoordinate of the rack
+    public Integer xCoordinate; // xCoordinate of the rack
 
     @NotNull
     @Min(0)
-    private Integer yCoordinate; // yCoordinate of the rack
-
-    // Getters
-    public Integer getxCoordinate(){
-        return xCoordinate;
-    }
-
-    public Integer getyCoordinate(){
-        return yCoordinate;
-    }
+    public Integer yCoordinate; // yCoordinate of the rack
 }

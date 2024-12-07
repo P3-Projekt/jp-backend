@@ -5,11 +5,11 @@ import com.dat3.jpgroentbackend.model.Batch;
 // A Data Transfer Object (DTO) for representing batch details in API responses.
 public class BatchDto {
 
-    public int batchId;
-    public String plantTypeId;
-    public String trayTypeId;
-    public String createdAt;
-    public String createdBy;
+    public final int batchId;
+    public final String plantTypeId;
+    public final String trayTypeId;
+    public final String createdAt;
+    public final String createdBy;
 
 
     /**

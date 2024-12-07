@@ -78,8 +78,8 @@ public class TaskController {
         );
 
         // Retrieve the user by their username or throw a NOT_FOUND exception if they don't exist
-        User user = userRepository.findById(request.getUsername()).orElseThrow(
-                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id '" + request.getUsername() + "' was not found")
+        User user = userRepository.findById(request.username).orElseThrow(
+                ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id '" + request.username + "' was not found")
         );
         // Mark the task as completed by the user
         task.complete(user);

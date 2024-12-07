@@ -6,11 +6,11 @@ import jakarta.validation.constraints.NotNull;
 // A Data Transfer Object (DTO) for representing batch location details in API requests or responses.
 public class BatchLocationDto {
     @NotNull // Ensures the field cannot be null during validation
-    private final int shelfId;
+    public final int shelfId;
     @NotNull
-    private final int amount;
+    public final int amount;
     @NotNull
-    private final int batchId;
+    public final int batchId;
 
     /**
      * Constructs a BatchLocationDto using a BatchLocation object.

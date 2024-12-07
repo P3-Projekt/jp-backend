@@ -9,10 +9,10 @@ import java.util.List;
 public class ShelfDto {
 
     // Properties of the Shelf DTO
-    private final int shelfId;
-    private final int rackId;
-    private final int position;
-    private final List<BatchLocationDto> batchLocations;
+    public final int shelfId;
+    public final int rackId;
+    public final int position;
+    public final List<BatchLocationDto> batchLocations;
 
     /**
      * Constructs a ShelfDto using a Shelf object.

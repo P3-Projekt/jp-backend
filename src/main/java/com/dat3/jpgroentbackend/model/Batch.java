@@ -63,6 +63,7 @@ public class Batch {
         this.harvestingTask = new Task(Task.Category.Harvest, harvestDueDate, this);
     }
 
+
     // Returns the next task that needs to be completed based on priority (plant, water, harvest).
     public Task getNextTask(){
         //Return pre-germination task if it hasn't been completed
@@ -95,6 +96,14 @@ public class Batch {
     /**
      * Returns the date of the latest completed task.
      */
+    /**
+     * Calculates the area
+     * @return
+     */
+    public int getBatchArea() {
+        return getTrayType().getLengthCm() * getTrayType().getWidthCm() * getAmount();
+    }
+
     public LocalDate getLatestCompletedTaskDate(){
         LocalDateTime latestCompletesTaskTime = getTasks().stream()
                 .map(Task::getCompletedAt)

@@ -4,12 +4,5 @@ package com.dat3.jpgroentbackend.controllers.dto.request;
 public class CompleteTaskRequest {
 
     // The name of the user completing the task
-    private String username;
-    
-    // Getter for username
-    public String getUsername() {
-        return username;
-    }
-
-    public CompleteTaskRequest() {}
+    public String username;
 }

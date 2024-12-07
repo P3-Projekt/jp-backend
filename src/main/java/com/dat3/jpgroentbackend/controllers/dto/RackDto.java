@@ -10,9 +10,9 @@ import java.util.List;
 // Converts a Rack model into a simplified structure for external use.
 public class RackDto {
 
-    private final int id; // Unique identifier for the rack
-    private final Vector2 position; // The 2D position of the rack in the facility
-    private final List<ShelfDto> shelves; // List of shelves contained within the rack
+    public final int id; // Unique identifier for the rack
+    public final Vector2 position; // The 2D position of the rack in the facility
+    public final List<ShelfDto> shelves; // List of shelves contained within the rack
 
     /**
      * Constructs a RackDto using a Rack object.
@@ -22,9 +22,9 @@ public class RackDto {
         this.id = rack.getId();
         this.position = rack.getPosition();
         if(rack.getShelves() != null) {
-            this.shelves = rack.getShelves().stream().map(ShelfDto::new).toList();
+            shelves = rack.getShelves().stream().map(ShelfDto::new).toList();
         } else {
-            this.shelves = new ArrayList<>();
+            shelves = new ArrayList<>();
         }
     }
 }

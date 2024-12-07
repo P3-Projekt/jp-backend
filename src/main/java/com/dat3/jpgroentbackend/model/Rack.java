@@ -57,10 +57,10 @@ public class Rack {
      * @return A sorted list of shelves or `null` if shelves are empty.
      */
     public List<Shelf> getShelves() {
-        if (shelves != null) {
+        if (!shelves.isEmpty()) {
             return shelves.stream().sorted(Comparator.comparingInt(Shelf::getPosition)).toList();
         }
-        return null;
+        return shelves;
     }
 
     // Adds a shelf
@@ -93,24 +93,28 @@ public class Rack {
      */
     public List<Integer> getMaxAmountOnShelves(Batch batch) {
         List<Integer> maxAmountOnShelves = new ArrayList<>();
-        for(Shelf shelf : shelves) {
-            int shelfArea = Shelf.length * Shelf.width; // Total shelf area
-
-            // Calculate occupied area on a shelf
-            int occupiedArea = shelf.getBatchLocations().stream().map(location -> {
-                int amount = location.getBatchAmount();
-                int width = location.getBatch().getTrayType().getWidthCm();
-                int length = location.getBatch().getTrayType().getLengthCm();
-                return amount * width * length;
-            }).reduce(0, Integer::sum);
-
-            // Calculate the area required for the given batch
-            int batchArea = batch.getTrayType().getWidthCm() * batch.getBatchLocations().size();
-
-            // Calculate the maximum amount of the batch that can fit on the shelf
-            int maxAmountOfBatchOnShelf = (shelfArea - occupiedArea)/batchArea;
-            maxAmountOnShelves.add(maxAmountOfBatchOnShelf);
+        for(Shelf shelf : getShelves()) {
+            int max = shelf.getMaxAmountOfBatch(batch);
+            // System.out.printf("\nMax amount on shelf with position %d on rack %d is %d", shelf.getPosition(), shelf.getRack().getId(), max);
+            maxAmountOnShelves.add(max);
         }
-        return maxAmountOnShelves;
+        return maxAmountOnShelves.reversed();
+    }
+
+    public int getTotalBatches() {
+        return shelves.stream()
+                .flatMap(shelf -> shelf.getBatchLocations().stream()) // Flatten all BatchLocations from all shelves
+                .mapToInt(BatchLocation::getBatchAmount) // Map to their amounts
+                .sum(); // Sum them up
+    }
+
+    public int getPercentageFilled() {
+        int numShelves = shelves.size();
+        float rackFilledPercentage = 0;
+        for (Shelf shelf : shelves) {
+            float shelfFilledPercentage = (float)shelf.getOccupiedArea() / shelf.getTotalArea();
+            rackFilledPercentage += (shelfFilledPercentage * 100) / numShelves;
+        }
+        return Math.round(rackFilledPercentage);
     }
 }

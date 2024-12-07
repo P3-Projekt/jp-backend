@@ -23,7 +23,7 @@ public class IntArrayToJsonConverter implements AttributeConverter<int[], String
     // Converts a JSON string from the database back to an int array.
     @Override
     public int[] convertToEntityAttribute(String dbData) {
-        System.out.println(dbData);
+        //System.out.println(dbData);
         try {
             return objectMapper.readValue(dbData, int[].class); // Deserialize JSON to array
         } catch (JsonProcessingException e) {

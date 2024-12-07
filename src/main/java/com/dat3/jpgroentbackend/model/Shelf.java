@@ -1,9 +1,9 @@
 package com.dat3.jpgroentbackend.model;
 
+import com.dat3.jpgroentbackend.exceptions.AreaExceededException;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 // Represents a shelf.
 @Entity // Database entity
@@ -64,5 +64,30 @@ public class Shelf {
 
     public void removeBatchLocation(BatchLocation batchLocation) {
         batchLocations.remove(batchLocation);
+    }
+
+    private int getLength() {
+        return length;
+    }
+
+    private int getWidth() {
+        return width;
+    }
+
+    public int getTotalArea() {
+        return getLength() * getWidth();
+    }
+
+    public int getOccupiedArea() {
+        return getBatchLocations().stream().map((location) -> location.getBatch().getTrayType().getArea() * location.getBatchAmount()).reduce(0, Integer::sum);
+    }
+
+    public int getMaxAmountOfBatch(Batch batch) {
+        int totalArea = getTotalArea();
+        int occupiedArea = getOccupiedArea();
+        if (occupiedArea > totalArea) {
+            throw new AreaExceededException(String.format("Occupied area %d is larger than total area %d on shelf %d", occupiedArea, totalArea, getId()));
+        }
+        return (getTotalArea() - getOccupiedArea()) / batch.getTrayType().getArea();
     }
 }

@@ -45,10 +45,10 @@ public class TrayTypeController {
     ) {
 
         // Prevent creating a TrayType if one with the same name already exists.
-        if(trayTypeRepository.existsById(request.getTrayTypeName())) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.getTrayTypeName() + "' already exists"); //IdAlreadyExistInDB(name);
+        if(trayTypeRepository.existsById(request.name)) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
 
         // Create a new TrayType entity using the provided request data.
-        TrayType trayType = new TrayType(request.getTrayTypeName(), request.getWidthCm(), request.getLengthCm());
+        TrayType trayType = new TrayType(request.name, request.widthCm, request.lengthCm);
 
         // Save the TrayType to the repository and return the saved entity.
         return trayTypeRepository.save(trayType);
@@ -56,32 +56,32 @@ public class TrayTypeController {
 
     /**
      * Deletes a tray type by its ID.
-     * @param trayTypeId The ID of the tray type to be deleted.
+     * @param name The ID of the tray type to be deleted.
      */
-    @DeleteMapping("TrayType/{trayTypeId}")
+    @DeleteMapping("TrayType/{name}")
     @Operation(
             summary = "Delete a TrayType" // Describes the purpose of the endpoint in Swagger.
     )
     public void DeleteTrayType(
-            @PathVariable String trayTypeId
+            @PathVariable String name
     ){
         // Check if the TrayType exists. If not, throw a NOT_FOUND exception.
-        if (!trayTypeRepository.existsById(trayTypeId)){
+        if (!trayTypeRepository.existsById(name)){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "A TrayType with id '" + trayTypeId + "' does not exist"
+                    HttpStatus.NOT_FOUND, "A TrayType with id '" + name + "' does not exist"
             );
         }
 
         // Check if the TrayType is in use by any Batch. If so, throw a CONFLICT exception.
-        if (batchRepository.existsByTrayType_Name(trayTypeId)) {
+        if (batchRepository.existsByTrayType_Name(name)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "The TrayType with id'" + trayTypeId + "' is currently used by at least one batch"
+                    "The TrayType with id'" + name + "' is currently used by at least one batch"
             );
         }
 
         // Delete the TrayType if it exists and is not in use.
-        trayTypeRepository.deleteById(trayTypeId);
+        trayTypeRepository.deleteById(name);
     }
 
     /**
