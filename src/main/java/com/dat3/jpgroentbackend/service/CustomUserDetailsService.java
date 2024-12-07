@@ -10,15 +10,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+// Service for loading user details from the database for authentication.
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Constructor for dependency injection of UserRepository.
+     * @param userRepository Repository to fetch user data.
+     */
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Loads a user's details by their username.
+     * @param username The username to search for.
+     * @return UserDetails object containing user information.
+     * @throws UsernameNotFoundException If the user is not found.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByName(username);
@@ -28,10 +39,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User userDetails = user.get();
 
-        // Brug en separat UserDetails-implementering her
+        // Builds a Spring Security UserDetails object from the fetched user.
         return org.springframework.security.core.userdetails.User
                 .withUsername(userDetails.getName())
-                .password(userDetails.getPassword()) // Husk at hash password i en rigtig implementering
+                .password(userDetails.getPassword()) // Ensure password is hashed in a real implementation.
                 .roles(userDetails.getRole().name())
                 .build();
     }

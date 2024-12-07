@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+// Represents a shelf.
+@Entity // Database entity
 public class Shelf {
-
     public static final int length = 100;
     public static final int width = 80;
 
@@ -19,17 +19,25 @@ public class Shelf {
     @JoinColumn(name = "rack_id")
     private Rack rack;
 
-    @OneToMany(mappedBy = "shelf")
-    private List<BatchLocation> batchLocations = new ArrayList<>();
+    @OneToMany(mappedBy = "shelf") // The "shelf" field in BatchLocation specifies this relationship
+    private final List<BatchLocation> batchLocations = new ArrayList<>();
 
     private int position;
 
+    // Default constructor
     public Shelf(){}
+
+    /**
+     * Constructs a new Shelf associated with a specific rack and position.
+     * @param rack     The rack to which this shelf belongs.
+     * @param position The position of the shelf within the rack.
+     */
     public Shelf(Rack rack, int position) {
         this.rack = rack;
         this.position = position;
     }
 
+    // Getters
     public int getId() {
         return id;
     }

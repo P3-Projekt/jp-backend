@@ -19,15 +19,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 
+// REST controller for managing batch-related operations
 @RestController
-@Tag(name = "PlantType")
-@Validated
+@Tag(name = "PlantType") // Swagger tag for the PlantType controller
+@Validated // Validate request bodies
 public class PlantTypeController{
+
+    // Injects the PlantType repository for database operations
     @Autowired
     private PlantTypeRepository plantTypeRepository;
+
+    // Injects the Batch repository to handle operations related to batches
     @Autowired
     private BatchRepository batchRepository;
 
+    /**
+     * Endpoint to create a new PlantType.
+     * @param request The request body containing PlantType details.
+     * @return The created PlantType.
+     */
     @PostMapping("/PlantType")
     @Operation(
             summary = "Create new PlantType"
@@ -36,19 +46,34 @@ public class PlantTypeController{
             @Valid
             @RequestBody CreatePlantTypeRequest request
     ) {
-        //Check if name i not already used
-        if(plantTypeRepository.existsById(request.name)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
+        // Check if a PlantType with the given name already exists
+        if(plantTypeRepository.existsById(request.getPlantTypeName())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT ,"A PlantType with id '" + request.getPlantTypeName() + "' already exists"); //IdAlreadyExistInDB(name);
         }
 
-        //Validate logic
-        if(request.growthTimeDays < request.preGerminationDays) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Growth time must be equal to or larger than germination time");
-        if(request.growthTimeDays < Arrays.stream(request.wateringSchedule).max().orElse(0)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It's not possible to have a watering schedule date higher than the growth time");
+        // Validate business logic for the PlantType creation
+        if(request.getGrowthTimeDays() < request.getPreGerminationDays())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Growth time must be equal to or larger than germination time");
+        // Ensure no watering schedule date exceeds the total growth time
+        if(request.getGrowthTimeDays() < Arrays.stream(request.getWateringSchedule()).max().orElse(0))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It's not possible to have a watering schedule date higher than the growth time");
 
-        PlantType plantType = new PlantType(request.name, request.preGerminationDays, request.growthTimeDays, request.preferredPosition, request.wateringSchedule);
-        return plantTypeRepository.save(plantType);
+        // Create a new PlantType entity from the request and save it to the database
+        PlantType plantType = new PlantType(
+                request.getPlantTypeName(),
+                request.getPreGerminationDays(),
+                request.getGrowthTimeDays(),
+                request.getPreferredPosition(),
+                request.getWateringSchedule()
+        );
+
+        return plantTypeRepository.save(plantType); // Return the saved entity
     }
 
+    /**
+     * Endpoint to retrieve all PlantType entities.
+     * @return An iterable collection of PlantTypes.
+     */
     @GetMapping("/PlantTypes")
     @Operation(
             summary = "List all PlantTypes",
@@ -57,9 +82,14 @@ public class PlantTypeController{
             }
     )
     public Iterable<PlantType> getAllPlantTypes() {
+        // Fetch all PlantType entities from the repository
         return plantTypeRepository.findAll();
     }
 
+    /**
+     * Endpoint to delete a specific PlantType.
+     * @param plantTypeName The name of the PlantType to delete.
+     */
     @DeleteMapping("/PlantType/{plantTypeName}")
     @Operation(
             summary = "Delete a PlantType"
@@ -67,8 +97,21 @@ public class PlantTypeController{
     public void deletePlantType(
             @PathVariable String plantTypeName
     ) {
-        if (!plantTypeRepository.existsById(plantTypeName)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A planttype with name '" + plantTypeName + "' does not exist");
-        if (batchRepository.existsByPlantType_Name(plantTypeName)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete plant '" + plantTypeName + "' as at least one batch is using it");
+        // Check if the PlantType exists in the database
+        if (!plantTypeRepository.existsById(plantTypeName)){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "A planttype with name '" + plantTypeName + "' does not exist"
+            );
+        }
+        // Prevent deletion if any batches are using the PlantType
+        if (batchRepository.existsByPlantType_Name(plantTypeName)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cannot delete plant '" + plantTypeName + "' as at least one batch is using it"
+            );
+        }
+        // Delete the PlantType from the repository
         plantTypeRepository.deleteById(plantTypeName);
     }
 }

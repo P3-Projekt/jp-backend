@@ -14,50 +14,57 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
+// Filter to process JWT tokens for authentication in each request.
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtil jwtUtil; // Utility class for JWT operations
 
     @Autowired
-    CustomUserDetailsService customUserDetailsService;
+    CustomUserDetailsService customUserDetailsService; // Loads user details for authentication
 
+    /**
+     * Processes each request to authenticate the user based on the JWT token.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        // Log alle anmodninger for at sikre, at OPTIONS bliver modtaget
-        System.out.println("Request Method: " + request.getMethod());
+        System.out.println("Request Method: " + request.getMethod()); // Log request method for debugging
 
+        // Allow OPTIONS requests without further processing
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK); // Returner status 200 for OPTIONS-anmodninger
             return;
         }
 
-        // Fortsæt med den oprindelige logik
+        // Extract Authorization header and parse JWT
         final String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
+            jwt = authHeader.substring(7); // Extract token from the header
             try {
-                username = jwtUtil.extractUsername(jwt);
+                username = jwtUtil.extractUsername(jwt); // Extract username from JWT
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT token expired");
             }
         }
 
+        // Authenticate user if token is valid and user is not already authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username); // Load user details
 
+            // Validate JWT token
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(userDetails);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // Set authentication in context
             }
         }
+
+        // Continue filter chain
         chain.doFilter(request, response);
     }
 
