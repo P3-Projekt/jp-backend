@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Entity
 public class Batch {
@@ -48,40 +46,44 @@ public class Batch {
 
         this.batchLocations.add(new BatchLocation(this, null, amount));
 
-        //Plant from pre-germination task
+        // Plant from pre-germination task
         LocalDate plantDueDate = LocalDate.now().plusDays(plantType.getPreGerminationDays());
         this.plantTask = new Task(Task.Category.Plant, plantDueDate, this);
 
-        //Water tasks
+        // Water tasks
         for(int waterAfterDays : plantType.getWateringSchedule()){
             LocalDate waterDueDate = LocalDate.now().plusDays(waterAfterDays);
             this.wateringTasks.add(new Task(Task.Category.Water, waterDueDate, this));
         }
 
-        //Harvest task
+        // Harvest task
         LocalDate harvestDueDate = LocalDate.now().plusDays(plantType.getGrowthTimeDays());
         this.harvestingTask = new Task(Task.Category.Harvest, harvestDueDate, this);
     }
 
+    public int getId(){
+        return id;
+    }
+
     public Task getNextTask(){
-        //Return pre-germination task if it hasn't been completed
+        // Return pre-germination task if it hasn't been completed
         if(this.plantTask.completedAt == null) return this.plantTask;
 
-        //Construct a list of all tasks except planting
+        // Construct a list of all tasks except planting
         List<Task> locationTasks = new ArrayList<>(this.wateringTasks);
         locationTasks.add(this.harvestingTask);
 
-        //Filter away completed tasks
+        // Filter away completed tasks
         List<Task> incompleteLocationTasks = locationTasks.stream().filter(task -> task.completedAt == null).toList();
         if(incompleteLocationTasks.isEmpty()){return null;}
 
-        //Find most relevant task
+        // Find most relevant task
         Task nextTask = incompleteLocationTasks.getFirst();
         for(Task task : incompleteLocationTasks){
             boolean isNewFirst = task.dueDate.isBefore(nextTask.dueDate);
             boolean isNoneFirst = task.dueDate.isEqual(nextTask.dueDate);
             boolean isWatering = task.category == Task.Category.Water;
-            //Prioritize tasks that are closer to be completed, then prioritize watering
+            // Prioritize tasks that are closer to be completed, then prioritize watering
             if(isNewFirst || (isNoneFirst && isWatering)){
                 nextTask = task;
             }
@@ -90,6 +92,13 @@ public class Batch {
 
     }
 
+    /**
+     * Calculates the area
+     * @return
+     */
+    public int getBatchArea() {
+        return getTrayType().getLengthCm() * getTrayType().getWidthCm() * getAmount();
+    }
 
     public LocalDate getLatestCompletedTaskDate(){
         LocalDateTime latestCompletesTaskTime = getTasks().stream()

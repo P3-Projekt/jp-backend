@@ -62,18 +62,12 @@ public class Rack {
     //Gets a list where every index corresponds to a shelf and the value corresponds to the maximum amount of a batch which can be added to that shelf
     public List<Integer> getMaxAmountOnShelves(Batch batch) {
         List<Integer> maxAmountOnShelves = new ArrayList<>();
-        for(Shelf shelf : shelves) {
-            int shelfTotalArea = shelf.getTotalArea();
-
-            //Calculate occupied area
-            int occupiedArea = shelf.getOccupiedArea();
-
-            int batchArea = batch.trayType.getWidthCm() * batch.batchLocations.size();
-
-            int maxAmountOfBatchOnShelf = (shelfTotalArea - occupiedArea)/batchArea;
-            maxAmountOnShelves.add(maxAmountOfBatchOnShelf);
+        for(Shelf shelf : getShelves()) {
+            int max = shelf.getMaxAmountOfBatch(batch);
+            // System.out.printf("\nMax amount on shelf with position %d on rack %d is %d", shelf.getPosition(), shelf.getRack().getId(), max);
+            maxAmountOnShelves.add(max);
         }
-        return maxAmountOnShelves;
+        return maxAmountOnShelves.reversed();
     }
 
     public int getTotalBatches() {

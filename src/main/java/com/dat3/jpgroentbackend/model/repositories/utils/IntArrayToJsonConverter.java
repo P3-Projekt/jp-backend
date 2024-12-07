@@ -20,7 +20,7 @@ public class IntArrayToJsonConverter implements AttributeConverter<int[], String
 
     @Override
     public int[] convertToEntityAttribute(String dbData) {
-        System.out.println(dbData);
+        //System.out.println(dbData);
         try {
             return objectMapper.readValue(dbData, int[].class);
         } catch (JsonProcessingException e) {

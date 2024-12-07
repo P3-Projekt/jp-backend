@@ -14,9 +14,9 @@ public class RackDto {
         this.id = rack.getId();
         this.position = rack.getPosition();
         if(rack.getShelves() != null) {
-            this.shelves = rack.getShelves().stream().map(ShelfDto::new).toList();
+            shelves = rack.getShelves().stream().map(ShelfDto::new).toList();
         } else {
-            this.shelves = new ArrayList<>();
+            shelves = new ArrayList<>();
         }
     }
 }

@@ -33,4 +33,8 @@ public class TrayType {
     public int getWidthCm() {
         return widthCm;
     }
+
+    public int getArea() {
+        return getLengthCm() * getWidthCm();
+    }
 }

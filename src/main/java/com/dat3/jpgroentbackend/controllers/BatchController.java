@@ -110,6 +110,7 @@ public class BatchController {
     }
 
     private void printMap(Map<Integer, Integer> nestedMap) {
+        System.out.println("Requested locations:");
         for (Map.Entry<Integer, Integer> entry :  nestedMap.entrySet()) {
             System.out.println(entry.getKey()+ ":" + entry.getValue());
         }
@@ -121,9 +122,9 @@ public class BatchController {
     )
         public void updateBatchPosition(
             @PathVariable int batchId,
-            //@Valid
+            @Valid
             @RequestBody UpdateBatchLocationRequest request
-            ){
+        ){
 
         System.out.println("Updating batch positions");
         printMap(request.locations);
@@ -140,10 +141,12 @@ public class BatchController {
         }
         BatchLocation emptyBatchLocation = batch.batchLocations.getFirst();
         int batchAmount = emptyBatchLocation.amount;
+        System.out.printf("Batchamount: %d%n", batchAmount);
 
         // Check if location amounts are complete
         int locatedAmount = request.locations.values().stream().reduce(0, Integer::sum);
         if(batchAmount != locatedAmount) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Located amount was " + locatedAmount + " but batch contains " + batchAmount + " fields");
+
 
         // Create batchLocations with the values from the request body
         List<BatchLocation> batchLocations = new ArrayList<>();
@@ -151,6 +154,13 @@ public class BatchController {
             int shelfId = location.getKey();
             int amount = location.getValue();
             Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Shelf with id '" + shelfId + "' was not found"));
+            System.out.printf("Putting amount '%d' of batch with id '%d' on shelf with id '%d' and position '%d' on rack with id '%d' rack id", amount, batchId, shelfId, shelf.getPosition(), shelf.getRack().getId());
+
+            // Check if request wants to put more than possible on any of the shelves
+            int maxAmountOfBatch = shelf.getMaxAmountOfBatch(batch);
+            if (amount > maxAmountOfBatch) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trying to place Batch with id '" + batch.getId() + "', but attempted to place " + amount + " units on shelf with max capacity " + maxAmountOfBatch);
+            }
             batchLocations.add(new BatchLocation(batch, shelf, amount));
         }
 
@@ -163,17 +173,15 @@ public class BatchController {
         batchRepository.save(batch);
         }
 
-class ScoreObj {
-        private final int position;
+    class ScoreObj {
+        private final int shelfId;
         private final int score;
         private final int amount;
-        private final int rackId;
         
-        private ScoreObj(int position, int score, int amount, int rackId) {
-            this.position = position;
+        private ScoreObj(int shelfId, int score, int amount) {
+            this.shelfId = shelfId;
             this.score = score;
             this.amount = amount;
-            this.rackId = rackId;
         }
 
         private int getScore() {
@@ -184,20 +192,16 @@ class ScoreObj {
             return amount;
         }
 
-        private int getPosition() {
-            return position;
+        private int getShelfId() {
+            return shelfId;
         }
-
-        private int getRackId() {
-            return rackId;
-        }
-}
+    }
 
     @GetMapping("/Batch/{batchId}/Autolocate")
     @Operation(
             summary = "Calculate the optimal location(s) for a batch"
     )
-    public Map<Integer, Map<Integer, Integer>> autolocateBatch(
+    public Map<Integer, Integer> autolocateBatch(
             @PathVariable int batchId
     ) {
         System.out.println("Starting autolocate");
@@ -207,10 +211,6 @@ class ScoreObj {
         PreferredPosition preferredPosition = plantType.getPreferredPosition();
 
         System.out.println("Got plant type and batch");
-
-//        for (BatchLocation bl : batch.batchLocations) {
-//            System.out.println("Batchlocation: " + bl.amount + ", " + bl.shelf + ", " + bl.id);
-//        }
         
         // Throw an exception if the batch has already been placed
         if (batch.batchLocations.size() != 1 && batch.batchLocations.getFirst().shelf != null) {
@@ -225,7 +225,7 @@ class ScoreObj {
         System.out.println("Rack amount: " + racks.size());
 
         for (Rack rack : racks) {
-            System.out.println("Looking at rack " + rack.getId());
+            System.out.println("\nLooking at rack " + rack.getId());
 
             // If no shelves on this rack, continue to the next rack
             if (rack.getShelves() == null) {
@@ -238,12 +238,12 @@ class ScoreObj {
             int highShelfIndex = rack.getShelves().size(); // Top position in the rack
 
             boolean rackContainsBatches = rackContainsBatches(rack); // True if the rack contains any batches at all
-            System.out.println("MaxAmountOnShelves size: " + maxAmountOnShelves.size());
+
+            // Go through all shelves in a rack, from the lowest one, as the positions are incremented each time; if we wanted to start from the top reversed() would be necessary
             for (Shelf shelf : rack.getShelves()) {
-                System.out.println("Looking at shelf " + shelf.getId());
-                // Get the max amount from this batch that can be placed on the current shelf
-                System.out.println("Shelf position: " + shelf.getPosition());
-                int maxOnThisShelf = maxAmountOnShelves.get(shelf.getPosition() - 1);
+
+                // Get the max amount from this batch that can be placed on the current shelf, must be reversed as maxAmountOnShelves is also reversed
+                int maxOnThisShelf = maxAmountOnShelves.reversed().get(shelf.getPosition() - 1);
 
                 // If the shelf cant have any trays of the batch on it, continue
                 if (maxOnThisShelf == 0) continue;
@@ -255,7 +255,7 @@ class ScoreObj {
                 if ((shelf.getPosition() == 1 && preferredPosition == PreferredPosition.Low) ||
                         (shelf.getPosition() == highShelfIndex && preferredPosition == PreferredPosition.High)) {
                     score += 100;
-                } else if (preferredPosition != PreferredPosition.NoPreferred) { //
+                } else if (preferredPosition != PreferredPosition.NoPreferred) { // Otherwise if the preferredPosition is not NoPreferred
                     continue;
                 }
 
@@ -275,71 +275,43 @@ class ScoreObj {
                     score += 25;
                 }
 
-                scoreList.add(new ScoreObj(shelf.getPosition(),  score, maxOnThisShelf, rack.getId()));
+                scoreList.add(new ScoreObj(shelf.getId(), score, maxOnThisShelf));
             }
         }
 
+        // Sort the score list by highest score, descending
         scoreList.sort(Comparator.comparingInt(ScoreObj::getScore).reversed());
 
+        // The total amount of fields in the batch
         int amountToBePlaced = batch.getAmount();
 
-        System.out.println("Found optimal locations");
         return getBatchesOnRack(scoreList, amountToBePlaced);
     }
 
-    private void printScoreList(List<ScoreObj> scoreList) {
-        System.out.println("Printing score list, length: " + scoreList.size());
-        for (ScoreObj scoreObj : scoreList) {
-            System.out.println("ScoreObject: rackId: " + scoreObj.getRackId() + ", maxAmountOnShelf: " + scoreObj.getAmount() + ",  position: " + scoreObj.getPosition() + ", score: "+ scoreObj.getScore());
-        }
-    }
-
-    private Map<Integer, Map<Integer, Integer>> getBatchesOnRack(List<ScoreObj> scoreList, int amountToBePlaced) {
-        printScoreList(scoreList);
-        System.out.println("Amount to be placed: " + amountToBePlaced);
-
-        Map<Integer, Map<Integer, Integer>> batchesOnRacks = new HashMap<>();
+    private Map<Integer, Integer> getBatchesOnRack(List<ScoreObj> scoreList, int amountToBePlaced) {
+        // Create a new map to store the data in
+        Map<Integer, Integer> batchesOnRacks = new HashMap<>();
 
         // Create an iterator to easily iterate through the list
         Iterator<ScoreObj> scoreIterator = scoreList.iterator();
 
         // Loop while we still need to place some and while there are still more score objects in the iterator
         while (amountToBePlaced > 0 && scoreIterator.hasNext()) {
+
             ScoreObj currentScoreObj = scoreIterator.next(); // Get the current score object
-            int rackId = currentScoreObj.getRackId();
-            int position = currentScoreObj.getPosition();
+            int shelfId = currentScoreObj.getShelfId();
             int amount = currentScoreObj.getAmount();
 
             // Get the minimum between amountToBePlaced and the amount that can be placed on this one
             int amountToBePlacedOnThisShelf = Math.min(amount, amountToBePlaced);
 
-            // Check if the map contains the current score objects shelf's rack
-            if (batchesOnRacks.containsKey(rackId)) {
-                System.out.println("Already contains " + rackId);
-                // Put a new key in the inner map, with the current score objects shelves position and the amount that can be placed on its shelf
-                batchesOnRacks.get(rackId).put(position, amountToBePlacedOnThisShelf);
-            } else {
-                // Create a new key with the rack id, which has a new map, where the current score objects shelf position and amount that can be placed is input into
-                batchesOnRacks.put(rackId, new HashMap<>());
-                batchesOnRacks.get(rackId).put(position,  amountToBePlacedOnThisShelf);
-            }
+            // Add a key value pair to the map
+            batchesOnRacks.put(shelfId, amountToBePlacedOnThisShelf);
 
             // Reduce amount to be placed
             amountToBePlaced -= amountToBePlacedOnThisShelf;
         }
-
-        System.out.println("Created map of optimal locations: " + batchesOnRacks.size());
-        printNestedMap(batchesOnRacks);
         return batchesOnRacks;
-    }
-
-    private void printNestedMap(Map<Integer, Map<Integer, Integer>> nestedMap) {
-        for (Map.Entry<Integer, Map<Integer, Integer>> outerEntry : nestedMap.entrySet()) {
-            System.out.println("Outer map key: " + outerEntry.getKey());
-            for (Map.Entry<Integer, Integer> innerEntry : outerEntry.getValue().entrySet()) {
-                System.out.println("Inner map key: " + innerEntry.getKey() + ", value: " + innerEntry.getValue());
-            }
-        }
     }
 
     private Set<LocalDate> getHarvestDatesOnShelf(Shelf shelf) {
