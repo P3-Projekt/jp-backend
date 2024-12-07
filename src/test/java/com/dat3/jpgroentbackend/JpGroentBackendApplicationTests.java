@@ -10,11 +10,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -55,20 +55,6 @@ public class JpGroentBackendApplicationTests {
         // Create demoShelf
         Shelf demoShelf = new Shelf();
         demoRack.addShelf(demoShelf);
-
-        // Create Traytype & Planttype
-        TrayType demoTrayType = new TrayType("lille", 10, 10);
-
-        int[] waterSchedule = {3,3,3,3};
-        PlantType demoPlantType = new PlantType("Solksikkeskud", 3, 3, PlantType.PreferredPosition.Low, waterSchedule);
-
-        // Create Batch
-        Batch demoBatch = new Batch(5, demoPlantType, demoTrayType, demoUser);
-
-        // Create a BatchLocation
-        BatchLocation demoBatchLocation = new BatchLocation(demoBatch, demoShelf, 5);
-
-        demoShelf.addBatchLocation(demoBatchLocation);
     }
 
     @Order(1)
@@ -92,7 +78,7 @@ public class JpGroentBackendApplicationTests {
     @Order(2)
     @Test
     void createUser() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createUser test.");
 
         mockMvc.perform(post("/User")
                 .contentType("application/json")
@@ -107,7 +93,7 @@ public class JpGroentBackendApplicationTests {
     @Order(3)
     @Test
     void createRack() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createRack test.");
 
         mockMvc.perform(post("/Rack")
                         .contentType("application/json")
@@ -124,7 +110,7 @@ public class JpGroentBackendApplicationTests {
     @Order(4)
     @Test
     void createShelf() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createShelf test.");
 
         String rackId = "1";
 
@@ -143,7 +129,7 @@ public class JpGroentBackendApplicationTests {
     @Order(5)
     @Test
     void createPlantType() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createPlantType test.");
 
         mockMvc.perform(post("/PlantType")
                         .contentType("application/json")
@@ -174,7 +160,7 @@ public class JpGroentBackendApplicationTests {
     @Order(6)
     @Test
     void createTrayType() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createTrayType test.");
 
         mockMvc.perform(post("/TrayType")
                         .contentType("application/json")
@@ -194,7 +180,7 @@ public class JpGroentBackendApplicationTests {
     @Order(7)
     @Test
     void createBatch() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping createBatch test.");
 
         mockMvc.perform(post("/Batch")
                         .contentType("application/json")
@@ -217,7 +203,7 @@ public class JpGroentBackendApplicationTests {
     @Order(8)
     @Test
     void getUsers() throws Exception { // done
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getUsers test.");
 
         mockMvc.perform(get("/Users")
                 .header("Authorization", "Bearer " + authToken))
@@ -231,48 +217,110 @@ public class JpGroentBackendApplicationTests {
     @Order(9)
     @Test
     void getTask() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getTask test.");
 
+
+        mockMvc.perform(get("/Tasks")
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].batchId").value(1))
+                .andExpect(jsonPath("$[0].taskId").value(2))
+                .andExpect(jsonPath("$[0].plantType").value("Solsikke"))
+                .andExpect(jsonPath("$[0].fields").value(10))
+                .andExpect(jsonPath("$[0].dueDate").value(Matchers.matchesPattern("^\\d{4}-\\d{2}-\\d{2}")))
+                .andExpect(jsonPath("$[0].category").value("Plant"))
+                .andExpect(jsonPath("$[0].completedAt").doesNotExist())
+                .andExpect(jsonPath("$[0].completedBy").doesNotExist());
     }
+
+
 
     @Order(10)
     @Test
     void getRacks() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getRacks test.");
 
+        mockMvc.perform(get("/Racks") // Endpoint for at hente racks
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].position.x").value(10))
+                .andExpect(jsonPath("$[0].position.y").value(10))
+                .andExpect(jsonPath("$[0].shelves").isArray())
+                .andExpect(jsonPath("$[0].shelves[0].id").value(1))
+                .andExpect(jsonPath("$[0].shelves[0].batches").isArray())
+                .andExpect(jsonPath("$[0].shelves[0].batches").isEmpty());
     }
+
 
     @Order(11)
     @Test
-    void getBatchesOnRack() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+    void updateBatchPos() throws Exception {
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateBatchPos test.");
+
+        int batchId = 1;
+        String requestBody = """
+        {
+            "locations": {
+                "1": 10
+            },
+            "username": "admin"
+        }
+        """;
+
+        mockMvc.perform(put("/Batch/{batchId}/Position", batchId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + authToken)
+                        .content(requestBody))
+                .andExpect(status().isOk());
     }
+
+// TODO: Kan ikke laves endnu, grundet fejl på backend
+//
+//    @Order(12)
+//    @Test
+//    void getBatchesOnRack() throws Exception {
+//        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getBatchesOnRack test.");
+//
+//        int rackId = 1;
+//
+//        mockMvc.perform(get("/Rack/{rackId}/Batches", rackId)
+//                        .header("Authorization", "Bearer " + authToken))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$").isArray())
+//                .andExpect(jsonPath("$[0].id").value(Matchers.greaterThan(0)))
+//                .andExpect(jsonPath("$[0].plantType.name").value("Solsikke"))
+//                .andExpect(jsonPath("$[0].batchLocations[0].shelf.rack.id").value(rackId));
+//    }
+
 
     @Order(12)
     @Test
     void getPregerminatingBatches() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+
+
     }
 
     @Order(13)
     @Test
     void getMaxBatchAmountOnShelf() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getMaxBatchAmountOnShelf test.");
 
         String batchId = "1";
 
         mockMvc.perform(get("/Batch/{batchId}/MaxAmountOnShelves", batchId)
                         .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("Stor"));
-              //  .andExpect(jsonPath("$.1[0]").value(1600)) // Forventer at "1" indeholder 1600 i den første position
-              //  .andExpect(jsonPath("$.2").isEmpty()); // Forventer at "2" er en tom liste
+                .andExpect(jsonPath("$.['1'][0]").value(383));
     }
 
     @Order(14)
     @Test
     void getTrayTypes() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getTrayTypes test.");
 
         mockMvc.perform(get("/TrayTypes")
                         .header("Authorization", "Bearer " + authToken))
@@ -285,7 +333,7 @@ public class JpGroentBackendApplicationTests {
     @Order(15)
     @Test
     void getPlantTypes() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getPlantTypes test.");
 
         mockMvc.perform(get("/PlantTypes")
                         .header("Authorization", "Bearer " + authToken))
@@ -324,38 +372,90 @@ public class JpGroentBackendApplicationTests {
 
 
 
-    // USER!
-    @Test
-    void updateUserDetails() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+// TODO: Kan ikke laves endnu, grundet fejl på backend
+//
+//    @Test
+//    void updateUserDetails() throws Exception {
+//        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+//
+//        mockMvc.perform(put("/User/1")
+//                        .contentType("application/json")
+//                        .content("""
+//                            {
+//                              "role": "Administrator",
+//                              "active": true
+//                            }""")
+//                        .header("Authorization", "Bearer " + authToken))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.name").value("updatedUser"))
+//                .andExpect(jsonPath("$.role").value("Administrator"))
+//                .andExpect(jsonPath("$.active").value(true));
+//    }
 
-    }
 
     @Test
     void deleteUser() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteUser test.");
+
+        String name = "admin";
+        mockMvc.perform(delete("/User/{name}", name)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
     }
+
 
     @Test
     void makeUserActive() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping makeUserActive test.");
+
+        String username = "admin";
+        mockMvc.perform(patch("/User/{username}/Activate",username)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(true));
     }
+
 
     // TASK
     @Test
     void completeTask() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping completeTask test.");
 
+        String taskId = "1";
+
+        mockMvc.perform(put("/Task/{taskId}/Complete", taskId)
+                        .contentType("application/json")
+                        .content("""
+                            {
+                              "username": "admin"
+                            }""")
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk());
     }
+
 
 
 
     // RACK
     @Test
     void updateRackPos() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateRackPos test.");
 
+        mockMvc.perform(put("/Rack/1/Position")
+                        .contentType("application/json")
+                        .content("""
+                            {
+                              "xCoordinate": 20,
+                              "yCoordinate": 20
+                            }""")
+                        .header("Authorization", "Bearer " + authToken))
+
+                .andExpect(jsonPath("$.position.x").value(20))
+                .andExpect(jsonPath("$.position.y").value(20))
+        .andExpect(status().isOk());
     }
+
 
 
 
@@ -363,20 +463,31 @@ public class JpGroentBackendApplicationTests {
 
     @Test
     void deleteShelf() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteShelf test.");
+
+        String rackId = "1";
+
+        mockMvc.perform(delete("/Rack/{rackId}/Shelf", rackId)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isConflict());
+
     }
+
 
 
     @Test
     void deleteRack() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteRack test.");
+
+        int rackId = 1;
+        mockMvc.perform(delete("/Rack/{rackId}", rackId)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isConflict());
     }
 
+
     // BATCH!
-    @Test
-    void updateBatchPos() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
-    }
+
 
 
 
@@ -385,14 +496,28 @@ public class JpGroentBackendApplicationTests {
 
     @Test
     void deleteTrayType() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteTrayType test.");
+
+        String trayTypeId = "Stor";
+
+        mockMvc.perform(delete("/TrayType/{trayTypeId}",trayTypeId)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isConflict());
     }
+
 
     // PLANTTYPE
 
     @Test
     void deletePlantType() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deletePlantType test.");
+
+        String plantType = "Solsikke";
+
+        mockMvc.perform(delete("/PlantType/{plantType}",plantType)
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isConflict());
     }
+
 
 }
