@@ -55,36 +55,6 @@ public class TrayTypeController {
     }
 
     /**
-     * Deletes a tray type by its ID.
-     * @param name The ID of the tray type to be deleted.
-     */
-    @DeleteMapping("TrayType/{name}")
-    @Operation(
-            summary = "Delete a TrayType" // Describes the purpose of the endpoint in Swagger.
-    )
-    public void DeleteTrayType(
-            @PathVariable String name
-    ){
-        // Check if the TrayType exists. If not, throw a NOT_FOUND exception.
-        if (!trayTypeRepository.existsById(name)){
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "A TrayType with id '" + name + "' does not exist"
-            );
-        }
-
-        // Check if the TrayType is in use by any Batch. If so, throw a CONFLICT exception.
-        if (batchRepository.existsByTrayType_Name(name)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "The TrayType with id'" + name + "' is currently used by at least one batch"
-            );
-        }
-
-        // Delete the TrayType if it exists and is not in use.
-        trayTypeRepository.deleteById(name);
-    }
-
-    /**
      * Retrieves all tray types.
      * @return An iterable list of all TrayType entities.
      */
@@ -98,5 +68,69 @@ public class TrayTypeController {
     public Iterable<TrayType> GetAllTrayTypes() {
         // Return all TrayType entities from the repository.
         return trayTypeRepository.findAll();
+    }
+
+    /**
+     * Inactivates a tray type.
+     * @param name The name of the tray type to inactivate.
+     * @return The inactivated TrayType entity.
+     */
+    @PutMapping("/TrayType/{name}/inactivate")
+    @Operation(
+            summary = "Inactivate a TrayType"
+    )
+    public TrayType InactivateTrayType(
+            @PathVariable String name
+    ) {
+        // Find the TrayType
+        TrayType trayType = trayTypeRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "A TrayType with id '" + name + "' does not exist"
+                ));
+
+        // Check if the TrayType is already inactive
+        if (!trayType.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The TrayType '" + name + "' is already inactive"
+            );
+        }
+
+        // Inactivate the TrayType
+        trayType.setInactive();
+        return trayTypeRepository.save(trayType);
+    }
+
+    /**
+     * Reactivates a tray type.
+     * @param name The name of the tray type to reactivate.
+     * @return The reactivated TrayType entity.
+     */
+    @PutMapping("/TrayType/{name}/activate")
+    @Operation(
+            summary = "Activate a TrayType"
+    )
+    public TrayType ActivateTrayType(
+            @PathVariable String name
+    ) {
+        // Find the TrayType
+        TrayType trayType = trayTypeRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "A TrayType with id '" + name + "' does not exist"
+                ));
+
+        // Check if the TrayType is already active
+        if (trayType.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The TrayType '" + name + "' is already active"
+            );
+        }
+
+        // Reactivate the TrayType
+        trayType.setActive();
+        return trayTypeRepository.save(trayType);
     }
 }

@@ -2,7 +2,6 @@ package com.dat3.jpgroentbackend.controllers;
 
 import com.dat3.jpgroentbackend.controllers.dto.UserDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateUserRequest;
-import com.dat3.jpgroentbackend.controllers.dto.request.UpdateUserRequest;
 import com.dat3.jpgroentbackend.model.User;
 import com.dat3.jpgroentbackend.model.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +34,7 @@ public class UserController {
 
     /**
      * Creates a new user.
+     *
      * @param request The request body containing user details.
      * @return The newly created User entity.
      */
@@ -46,13 +46,13 @@ public class UserController {
             @Valid
             @RequestBody CreateUserRequest request // Validates the request body.
     ) {
-            // Check if a user with the given username already exists.
-            if(userRepository.existsById(request.name)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT ,
-                        "A User with name '" + request.name + "' already exists"
-                );
-            }
+        // Check if a user with the given username already exists.
+        if (userRepository.existsById(request.name)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "A User with name '" + request.name + "' already exists"
+            );
+        }
 
         // Create a new User entity with encoded password.
         User user = new User(request.name, request.role, passwordEncoder.encode(request.password));
@@ -63,6 +63,7 @@ public class UserController {
 
     /**
      * Retrieves all users.
+     *
      * @return An iterable list of all User entities.
      */
     @GetMapping("/Users")
@@ -83,9 +84,10 @@ public class UserController {
 
     /**
      * Marks a user as inactive.
+     *
      * @param name The username of the user to be marked inactive.
      */
-    @DeleteMapping("/Users/{name}")
+    @PutMapping("/Users/{name}")
     @Operation(
             summary = "Set a user inactive" // Describes the purpose of the endpoint in Swagger.
     )
@@ -106,6 +108,7 @@ public class UserController {
 
     /**
      * Reactivates a previously inactive user.
+     *
      * @param name The username of the user to be reactivated.
      */
     @PutMapping("/Users/{name}/activate")
@@ -134,34 +137,4 @@ public class UserController {
         user.setActive(true);
         userRepository.save(user);
     }
-
-    /**
-     * Updates the details of an existing user.
-     * @param name    The username of the user to be updated.
-     * @param request The request body containing the updated user details.
-     * @return The updated User entity.
-     */
-    @PutMapping("/Users/{name}")
-    @Operation(
-            summary = "Update user details" // Describes the purpose of the endpoint in Swagger.
-    )
-    public User updateUser(
-            @PathVariable String name,
-            @Valid @RequestBody UpdateUserRequest request
-    ) {
-        // Find the user by name; throw an exception if not found.
-        User user = userRepository.findById(name)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User with name '" + name + "' was not found")
-                );
-
-        // Update the user's role if provided in the request.
-        if (request.role != null) {
-            user.setRole(request.role);
-        }
-
-        // Save the updated user entity and return it.
-        return userRepository.save(user);
-    }
-
 }
