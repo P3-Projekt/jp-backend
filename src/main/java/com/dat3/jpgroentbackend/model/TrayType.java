@@ -15,6 +15,8 @@ public class TrayType {
 
     private int widthCm;
 
+    private boolean active = true;
+
     /**
      * Constructor to create a TrayType with a given name, length, and width.
      * @param name      The name of the tray type.
@@ -45,5 +47,21 @@ public class TrayType {
 
     public int getArea() {
         return getLengthCm() * getWidthCm();
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setInactive() {
+        active = false;
+    }
+
+    public void setActive() {
+        active = true;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
