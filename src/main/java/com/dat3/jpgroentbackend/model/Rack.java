@@ -100,16 +100,6 @@ public class Rack {
         return maxAmountOnShelves.reversed();
     }
 
-    public int getPercentageFilled() {
-        int numShelves = shelves.size();
-        float rackFilledPercentage = 0;
-        for (Shelf shelf : shelves) {
-            float shelfFilledPercentage = (float)shelf.getOccupiedArea() / shelf.getTotalArea();
-            rackFilledPercentage += (shelfFilledPercentage * 100) / numShelves;
-        }
-        return Math.round(rackFilledPercentage);
-    }
-
     /**
      * Check if this rack contains any batches
      * @return True if the rack contains any batches, false otherwise
