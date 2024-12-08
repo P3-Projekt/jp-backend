@@ -3,6 +3,7 @@ package com.dat3.jpgroentbackend.model;
 import com.dat3.jpgroentbackend.exceptions.AreaExceededException;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 // Represents a shelf.
@@ -62,10 +63,6 @@ public class Shelf {
         batchLocations.add(batchLocation);
     }
 
-    public void removeBatchLocation(BatchLocation batchLocation) {
-        batchLocations.remove(batchLocation);
-    }
-
     private int getLength() {
         return length;
     }
@@ -89,5 +86,37 @@ public class Shelf {
             throw new AreaExceededException(String.format("Occupied area %d is larger than total area %d on shelf %d", occupiedArea, totalArea, getId()));
         }
         return (getTotalArea() - getOccupiedArea()) / batch.getTrayType().getArea();
+    }
+
+    /**
+     * Checks if the shelf has any batches
+     * @return True if it contains atleast one batchLocation
+     */
+    public boolean containsBatches() {
+        return !getBatchLocations().isEmpty();
+    }
+
+    /**
+     * Get all the plant types on a shelf
+     * @return A set of all the plant types on the shelf
+     */
+    public Set<PlantType> getPlantTypesOnShelf() {
+        Set<PlantType> plantTypesOnShelf = new HashSet<>();
+        for (BatchLocation batchLocation : getBatchLocations()) {
+            plantTypesOnShelf.add(batchLocation.getBatch().getPlantType());
+        }
+        return plantTypesOnShelf;
+    }
+
+    /**
+     * Get all the harvest dates of batches on a shelf
+     * @return A set of all the harvest dates of batches on the shelf
+     */
+    public Set<LocalDate> getHarvestDatesOnShelf() {
+        Set<LocalDate> harvestDatesOnShelf = new HashSet<>();
+        for (BatchLocation batchLocation : getBatchLocations()) {
+            harvestDatesOnShelf.add(batchLocation.getBatch().getHarvestingTask().getDueDate());
+        }
+        return harvestDatesOnShelf;
     }
 }
