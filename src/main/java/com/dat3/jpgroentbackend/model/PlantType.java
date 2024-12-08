@@ -27,6 +27,7 @@ public class PlantType {
     // Custom converter to store and retrieve int arrays as JSON in the database
     @Convert(converter = IntArrayToJsonConverter.class)
     private int[] wateringSchedule;
+    private boolean active = true;
 
     /**
      * Constructor to initialize a PlantType object.
@@ -67,6 +68,18 @@ public class PlantType {
 
     public int[] getWateringSchedule() {
         return wateringSchedule;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setInactive() {
+        active = false;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
 

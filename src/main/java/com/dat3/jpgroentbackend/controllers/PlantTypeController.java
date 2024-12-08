@@ -86,32 +86,45 @@ public class PlantTypeController{
         return plantTypeRepository.findAll();
     }
 
-    /**
-     * Endpoint to delete a specific PlantType.
-     * @param name The name of the PlantType to delete.
-     */
-    @DeleteMapping("/PlantType/{name}")
-    @Operation(
-            summary = "Delete a PlantType"
-    )
-    public void deletePlantType(
+    @PutMapping("/PlantType/{name}")
+    @Operation(summary = "Set a PlantType inactive")
+    public void setPlantTypeInactive(
             @PathVariable String name
     ) {
-        // Check if the PlantType exists in the database
-        if (!plantTypeRepository.existsById(name)){
+        // Find the active PlantType by name; throw an exception if not found
+        PlantType plantType = plantTypeRepository.findByNameAndActive(name, true)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "PlantType with name '" + name + "' was not found or is already inactive")
+                );
+
+        // Set the PlantType's active status to false and save the updated entity
+        plantType.setInactive();
+        plantTypeRepository.save(plantType);
+    }
+
+    @PutMapping("/PlantType/{name}/activate")
+    @Operation(summary = "Reactivate a PlantType")
+    public void reactivatePlantType(
+            @PathVariable String name
+    ) {
+        // Find the PlantType by name; throw an exception if not found
+        PlantType plantType = plantTypeRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "PlantType with name '" + name + "' was not found")
+                );
+
+        // If the PlantType is already active, throw a BAD_REQUEST exception
+        if (plantType.isActive()) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "A planttype with name '" + name + "' does not exist"
+                    HttpStatus.BAD_REQUEST,
+                    "PlantType is already active"
             );
         }
-        // Prevent deletion if any batches are using the PlantType
-        if (batchRepository.existsByPlantType_Name(name)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Cannot delete plant '" + name + "' as at least one batch is using it"
-            );
-        }
-        // Delete the PlantType from the repository
-        plantTypeRepository.deleteById(name);
+
+        // Set the PlantType's active status to true and save the updated entity
+        plantType.setActive(true);
+        plantTypeRepository.save(plantType);
     }
 }
