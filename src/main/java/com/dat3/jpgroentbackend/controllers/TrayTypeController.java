@@ -48,7 +48,7 @@ public class TrayTypeController {
         if(trayTypeRepository.existsById(request.name)) throw new ResponseStatusException(HttpStatus.CONFLICT ,"A TrayType with id '" + request.name + "' already exists"); //IdAlreadyExistInDB(name);
 
         // Create a new TrayType entity using the provided request data.
-        TrayType trayType = new TrayType(request.name, request.widthCm, request.lengthCm);
+        TrayType trayType = new TrayType(request.name, request.lengthCm, request.widthCm);
 
         // Save the TrayType to the repository and return the saved entity.
         return trayTypeRepository.save(trayType);
