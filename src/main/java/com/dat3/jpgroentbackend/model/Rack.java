@@ -109,4 +109,17 @@ public class Rack {
         }
         return Math.round(rackFilledPercentage);
     }
+
+    /**
+     * Check if this rack contains any batches
+     * @return True if the rack contains any batches, false otherwise
+     */
+    public boolean containsBatches() {
+        for (Shelf shelf : getShelves()) {
+            if (shelf.containsBatches()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
