@@ -1,12 +1,11 @@
 package com.dat3.jpgroentbackend.model;
 
+import com.dat3.jpgroentbackend.model.repositories.utils.ShelfScore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 // Represents a batch of plants, including tasks related to planting, watering, and harvesting.
 @Entity
@@ -91,17 +90,6 @@ public class Batch {
         }
         return nextTask;
 
-    }
-
-    /**
-     * Returns the date of the latest completed task.
-     */
-    /**
-     * Calculates the area
-     * @return
-     */
-    public int getBatchArea() {
-        return getTrayType().getLengthCm() * getTrayType().getWidthCm() * getAmount();
     }
 
     public LocalDate getLatestCompletedTaskDate(){
@@ -221,5 +209,77 @@ public class Batch {
 
     public static List<Batch> filterPreGerminatingBatches(List<Batch> batches){
         return batches.stream().filter(batch -> batch.plantTask.getCompletedAt() == null).toList();
+    }
+
+    /**
+     * Find optimal location(s) for the batch as a list of ShelfScore
+     * @param racks A list of available racks, sorted with the 'best' racks in the start
+     * @return A List<ShelfScore> sorted by score, descending.
+     */
+    public List<ShelfScore> autolocate(List<Rack> racks){
+        List<ShelfScore> scoreList = new ArrayList<>();
+
+        PlantType.PreferredPosition preferredPosition = getPlantType().getPreferredPosition();
+
+        // Iterate through all racks in the list
+        for (Rack rack : racks) {
+            // If no shelves on this rack, continue to the next rack
+            if (rack.getShelves() == null) {
+                continue;
+            }
+
+            // Get a list of the maximum amount of this batch that can be on each shelf
+            List<Integer> maxAmountOnShelves = rack.getMaxAmountOnShelves(this);
+
+            // Get a list of shelves on the current rack
+            List<Shelf> shelves = rack.getShelves();
+
+            int highShelfIndex = shelves.size(); // Top position in the rack
+
+            // Go through all shelves in a rack, from the lowest one, as the positions are incremented each time; if we wanted to start from the top reversed() would be necessary
+            for (Shelf shelf : shelves) {
+
+                // Get the max amount from this batch that can be placed on the current shelf, must be reversed as maxAmountOnShelves is also reversed
+                int maxOnThisShelf = maxAmountOnShelves.reversed().get(shelf.getPosition() - 1);
+
+                // If the shelf cant have any trays of the batch on it, continue
+                if (maxOnThisShelf == 0) continue;
+
+                // Sets the score to 10 or 0 depending on if the rack contains batches
+                int score = rack.containsBatches() ? 10 : 0;
+
+                // Increases score if the plant type has a preferred position and the shelf matches the preferred position
+                if ((shelf.getPosition() == 1 && preferredPosition == PlantType.PreferredPosition.Low) ||
+                        (shelf.getPosition() == highShelfIndex && preferredPosition == PlantType.PreferredPosition.High)) {
+                    score += 100;
+                } else if (preferredPosition != PlantType.PreferredPosition.NoPreferred) { // Otherwise if the preferredPosition is not NoPreferred
+                    continue;
+                }
+
+                // Get all the plant types on the current shelf
+                Set<PlantType> plantTypesOnShelf = shelf.getPlantTypesOnShelf();
+
+                // If the shelf does NOT already contain the plant type which the batch has, increase score
+                if (!plantTypesOnShelf.contains(getPlantType())) {
+                    score += 50;
+                }
+
+                // Get all the harvest dates of batches on the current shelf
+                Set<LocalDate> harvestDatesOnShelf = shelf.getHarvestDatesOnShelf();
+
+                // If there is any batch with the same harvest date on the current shelf, increase score
+                if (harvestDatesOnShelf.contains(getHarvestingTask().getDueDate())) {
+                    score += 25;
+                }
+
+                // Add the new shelfScore to the list
+                scoreList.add(new ShelfScore(shelf.getId(), score, maxOnThisShelf));
+            }
+        }
+
+        // Sort the list by score, descending
+        scoreList.sort(Comparator.comparingInt(ShelfScore::getScore).reversed());
+
+        return scoreList;
     }
 }
