@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
+import java.util.List;
 import java.util.Locale;
 
 // Represents a task.
@@ -65,9 +66,15 @@ public class Task {
      * @return `true` if the task is due in the specified week, `false` otherwise.
      */
     public boolean isTaskDueInWeek(int weekNumber) {
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        WeekFields weekFields = WeekFields.ISO;
         int dueDateWeekNumber = this.dueDate.get(weekFields.weekOfWeekBasedYear());
         return dueDateWeekNumber == weekNumber;
+    }
+
+    public boolean getIsPlaced(){
+        List<BatchLocation> batchLocations = this.batch.getBatchLocations();
+
+        return batchLocations.size() != 1 || batchLocations.getFirst().getShelf() != null;
     }
 
     // Getters

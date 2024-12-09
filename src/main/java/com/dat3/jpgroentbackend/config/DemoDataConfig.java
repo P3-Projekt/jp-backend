@@ -2,6 +2,7 @@ package com.dat3.jpgroentbackend.config;
 
 import com.dat3.jpgroentbackend.model.User;
 import com.dat3.jpgroentbackend.model.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 // This class is used to create a demo user when the application starts
 @Configuration // Used for Bean configuration for spring
 public class DemoDataConfig {
+
+    // User config
+    private static final String initUserName = "Jens";
+    private static final String initUserPassword = "Jens9876";
+
 
     // Autowire the user repository and password encoder
     private final UserRepository userRepository;
@@ -20,6 +26,7 @@ public class DemoDataConfig {
      * @param userRepository The user repository
      * @param passwordEncoder The password encoder
      */
+    @Autowired
     public DemoDataConfig(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -33,20 +40,24 @@ public class DemoDataConfig {
     public CommandLineRunner demoData() {
         return args -> {
             // Check if user already exists
-            if (userRepository.findByName("demo").isEmpty()) {
+            if (userRepository.findByName(initUserName).isEmpty()) {
                 // Create and save the demo user
-                User demoUser = new User();
-                demoUser.setName("Jens");
-                demoUser.setPassword(passwordEncoder.encode("Jens9876")); // Use a simple password for testing
-                demoUser.setRole(User.Role.Administrator); // Set the role as needed
-                demoUser.setActive(true); // Set the user as active
+                User initialUser = new User();
+                initialUser.setName(initUserName);
+                initialUser.setPassword(passwordEncoder.encode(initUserPassword)); // Use a simple password for testing
+                initialUser.setRole(User.Role.Administrator); // Set the role as needed
+                initialUser.setActive(true); // Set the user as active
 
                 // Save the user
-                userRepository.save(demoUser);
-                System.out.println("Demo user created!");
+                userRepository.save(initialUser);
+                System.out.println("Initial user for Jens created!");
             } else {
-                System.out.println("Demo user already exists!");
+                System.out.println("Initial user for Jens already exists!");
             }
         };
+    }
+
+    public static String getInitUserName() {
+        return DemoDataConfig.initUserName;
     }
 }

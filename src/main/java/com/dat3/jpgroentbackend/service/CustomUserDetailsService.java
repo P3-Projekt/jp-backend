@@ -42,7 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Builds a Spring Security UserDetails object from the fetched user.
         return org.springframework.security.core.userdetails.User
                 .withUsername(userDetails.getName())
-                .password(userDetails.getPassword()) // Ensure password is hashed in a real implementation.
+                .password(userDetails.getPassword())
                 .roles(userDetails.getRole().name())
                 .build();
     }

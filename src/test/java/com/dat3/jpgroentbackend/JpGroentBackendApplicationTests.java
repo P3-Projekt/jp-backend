@@ -208,7 +208,7 @@ public class JpGroentBackendApplicationTests {
         mockMvc.perform(get("/Users")
                 .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("demo"))
+                .andExpect(jsonPath("$[0].name").value("Jens"))
                 .andExpect(jsonPath("$[0].role").value("Administrator"))
                 .andExpect(jsonPath("$[0].active").value(true))
                 .andExpect(jsonPath("$[0].password").isString());

@@ -15,6 +15,7 @@ public class TaskResponse{
     public final LocalDate dueDate;
     public final Task.Category category;
     public final LocalDateTime completedAt;
+    public final boolean isPlaced;
     public String completedBy;
 
     /**
@@ -30,6 +31,7 @@ public class TaskResponse{
         this.dueDate = task.getDueDate();
         this.category = task.getCategory();
         this.completedAt = task.getCompletedAt();
+        this.isPlaced = task.getIsPlaced();
         // Populate completedBy if the task has a completedBy user
         if(task.getCompletedBy() != null) {
             this.completedBy = task.getCompletedBy().getName();
