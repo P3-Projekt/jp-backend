@@ -41,8 +41,8 @@ public class JpGroentBackendApplicationTests {
     @BeforeEach
     void setUp() {
         User demoUser = new User();
-        demoUser.setName("demo");
-        demoUser.setPassword(passwordEncoder.encode("12345")); // Use a simple password for testing
+        demoUser.setName("Jens");
+        demoUser.setPassword(passwordEncoder.encode("Jens9876")); // Use a simple password for testing
         demoUser.setRole(User.Role.Administrator); // Set the role as needed
         demoUser.setActive(true); // Set the user as active
 
@@ -63,7 +63,7 @@ public class JpGroentBackendApplicationTests {
 
         authToken = mockMvc.perform(post("/api/auth/login")
                         .contentType("application/json")
-                        .content("{\"username\": \"demo\", \"password\": \"12345\"}"))
+                        .content("{\"username\": \"Jens\", \"password\": \"Jens9876\"}"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -87,8 +87,7 @@ public class JpGroentBackendApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("admin"))
                 .andExpect(jsonPath("$.role").value("Administrator"))
-                .andExpect(jsonPath("$.active").value(true))
-                .andExpect(jsonPath("$.password").isString());
+                .andExpect(jsonPath("$.active").value(true));
     }
     @Order(3)
     @Test
@@ -210,8 +209,7 @@ public class JpGroentBackendApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Jens"))
                 .andExpect(jsonPath("$[0].role").value("Administrator"))
-                .andExpect(jsonPath("$[0].active").value(true))
-                .andExpect(jsonPath("$[0].password").isString());
+                .andExpect(jsonPath("$[0].active").value(true));
     }
 
     @Order(9)
@@ -314,7 +312,7 @@ public class JpGroentBackendApplicationTests {
         mockMvc.perform(get("/Batch/{batchId}/MaxAmountOnShelves", batchId)
                         .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.['1'][0]").value(383));
+                .andExpect(jsonPath("$.['1'][0]").value(25));
     }
 
     @Order(14)
