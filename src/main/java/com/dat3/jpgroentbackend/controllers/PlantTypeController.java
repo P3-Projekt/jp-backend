@@ -99,7 +99,7 @@ public class PlantTypeController{
                 );
 
         // Set the PlantType's active status to false and save the updated entity
-        plantType.setInactive();
+        plantType.setActive(false);
         plantTypeRepository.save(plantType);
     }
 

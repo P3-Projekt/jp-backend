@@ -74,10 +74,6 @@ public class PlantType {
         return active;
     }
 
-    public void setInactive() {
-        active = false;
-    }
-
     public void setActive(boolean active) {
         this.active = active;
     }

@@ -53,14 +53,6 @@ public class TrayType {
         return active;
     }
 
-    public void setInactive() {
-        active = false;
-    }
-
-    public void setActive() {
-        active = true;
-    }
-
     public void setActive(boolean active) {
         this.active = active;
     }

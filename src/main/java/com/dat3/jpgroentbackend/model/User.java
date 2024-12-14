@@ -55,10 +55,6 @@ public class User {
         return active;
     }
 
-    public void setInactive() {
-        active = false;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -70,10 +66,4 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
     }
-
-    public void setActive() {
-        active = true;
-    }
-
-
 }

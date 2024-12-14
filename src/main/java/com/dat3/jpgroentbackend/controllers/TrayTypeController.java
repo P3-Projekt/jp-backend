@@ -98,7 +98,7 @@ public class TrayTypeController {
         }
 
         // Inactivate the TrayType
-        trayType.setInactive();
+        trayType.setActive(false);
         return trayTypeRepository.save(trayType);
     }
 
@@ -130,7 +130,7 @@ public class TrayTypeController {
         }
 
         // Reactivate the TrayType
-        trayType.setActive();
+        trayType.setActive(true);
         return trayTypeRepository.save(trayType);
     }
 }

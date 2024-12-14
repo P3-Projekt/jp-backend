@@ -102,7 +102,7 @@ public class UserController {
                 );
 
         // Set the user's active status to false and save the updated entity.
-        user.setInactive();
+        user.setActive(false);
         userRepository.save(user);
     }
 
