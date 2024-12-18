@@ -239,8 +239,22 @@ public class EndpointTest {
                 .andExpect(jsonPath("$[0].shelves[0].batches").isEmpty());
     }
 
-
     @Order(11)
+    @Test
+    void PreGerminatingBatchesBefore() throws Exception {
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping PreGerminatingBatches test.");
+
+        mockMvc.perform(get("/PreGerminatingBatches")
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsMorePreGermination[0].batchId").value(1))
+                .andExpect(jsonPath("$.needsMorePreGermination[0].amount").value(10))
+                .andExpect(jsonPath("$.needsMorePreGermination[0].plantName").value("Solsikke"))
+                .andExpect(jsonPath("$.needsMorePreGermination[0].dueDate").value("2024-12-19"))
+                .andExpect(jsonPath("$.canBePlaced").isEmpty());
+    }
+
+    @Order(12)
     @Test
     void updateBatchPos() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateBatchPos test.");
@@ -262,15 +276,20 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(12)
+    @Order(13)
     @Test
-    void getPregerminatingBatches() throws Exception {
-        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateUserDetails test.");
+    void PreGerminatingBatchesAfter() throws Exception {
+        assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping PreGerminatingBatches test.");
 
-
+        mockMvc.perform(get("/PreGerminatingBatches")
+                        .header("Authorization", "Bearer " + authToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.canBePlaced").isEmpty())
+                .andExpect(jsonPath("$.needsMorePreGermination").isEmpty());
     }
 
-    @Order(13)
+
+    @Order(14)
     @Test
     void getMaxBatchAmountOnShelf() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getMaxBatchAmountOnShelf test.");
@@ -283,7 +302,7 @@ public class EndpointTest {
                 .andExpect(jsonPath("$.['1'][0]").value(25));
     }
 
-    @Order(14)
+    @Order(15)
     @Test
     void getTrayTypes() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getTrayTypes test.");
@@ -296,7 +315,7 @@ public class EndpointTest {
                 .andExpect(jsonPath("$[0].lengthCm").value(15));
     }
 
-    @Order(15)
+    @Order(16)
     @Test
     void getPlantTypes() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping getPlantTypes test.");
@@ -314,7 +333,7 @@ public class EndpointTest {
                 .andExpect(jsonPath("$[0].wateringSchedule[2]").value(7));
     }
 
-    @Order(16)
+    @Order(17)
     @Test
     void setUserAsInactive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteUser test.");
@@ -325,7 +344,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(17)
+    @Order(18)
     @Test
     void setUserAsActive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping makeUserActive test.");
@@ -336,7 +355,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(18)
+    @Order(19)
     @Test
     void completeTask() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping completeTask test.");
@@ -355,7 +374,7 @@ public class EndpointTest {
 
 
 
-    @Order(19)
+    @Order(20)
     @Test
     void updateRackPos() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping updateRackPos test.");
@@ -374,7 +393,7 @@ public class EndpointTest {
         .andExpect(status().isOk());
     }
 
-    @Order(20)
+    @Order(21)
     @Test
     void deleteShelf() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteShelf test.");
@@ -387,7 +406,7 @@ public class EndpointTest {
 
     }
 
-    @Order(21)
+    @Order(22)
     @Test
     void deleteRack() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping deleteRack test.");
@@ -398,7 +417,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(22)
+    @Order(23)
     @Test
     void setTrayTypeAsInactive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping setTrayTypeAsInactive test.");
@@ -409,7 +428,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(23)
+    @Order(24)
     @Test
     void setTrayTypeAsActive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping setTrayTypeAsActive test.");
@@ -420,7 +439,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(24)
+    @Order(25)
     @Test
     void setPlantTypeAsInactive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping setPlantTypeAsInactive test.");
@@ -431,7 +450,7 @@ public class EndpointTest {
                 .andExpect(status().isOk());
     }
 
-    @Order(25)
+    @Order(26)
     @Test
     void setPlantTypeAsActive() throws Exception {
         assumeTrue(authToken != null && !authToken.isEmpty(), "Authentication failed, skipping setPlantTypeAsActive test.");
