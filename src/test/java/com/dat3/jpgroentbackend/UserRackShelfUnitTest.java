@@ -6,9 +6,7 @@ import com.dat3.jpgroentbackend.controllers.dto.RackDto;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateRackRequest;
 import com.dat3.jpgroentbackend.controllers.dto.request.CreateUserRequest;
 import com.dat3.jpgroentbackend.controllers.dto.response.RacksResponse;
-import com.dat3.jpgroentbackend.model.Rack;
-import com.dat3.jpgroentbackend.model.Shelf;
-import com.dat3.jpgroentbackend.model.User;
+import com.dat3.jpgroentbackend.model.*;
 import com.dat3.jpgroentbackend.model.repositories.BatchLocationRepository;
 import com.dat3.jpgroentbackend.model.repositories.RackRepository;
 import com.dat3.jpgroentbackend.model.repositories.ShelfRepository;
@@ -23,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class UnitTest {
+public class UserRackShelfUnitTest {
 
     @Mock
     private UserRepository userRepository;
@@ -202,5 +202,166 @@ public class UnitTest {
         verify(rackRepository, times(1)).findById(1);
         verify(shelfRepository, times(1)).save(any(Shelf.class));
     }
+
+    @Test
+    void testCreateShelf_WithExistingShelves() {
+        Rack mockRack = new Rack(10, 20);
+
+        Shelf existingShelf = new Shelf(mockRack, 1);
+        mockRack.addShelf(existingShelf);
+
+        when(rackRepository.findById(1)).thenReturn(Optional.of(mockRack));
+        when(shelfRepository.findFirstByRackOrderByPositionDesc(mockRack))
+                .thenAnswer(invocation -> mockRack.getShelves().stream()
+                        .max(Comparator.comparingInt(Shelf::getPosition)));
+        when(shelfRepository.save(any(Shelf.class)))
+                .thenAnswer(invocation -> {
+                    Shelf shelf = invocation.getArgument(0);
+                    mockRack.addShelf(shelf);
+                    return shelf;
+                });
+
+        rackController.createShelf(1);
+        rackController.createShelf(1);
+        RacksResponse response = rackController.createShelf(1);
+
+        assertNotNull(response);
+        assertEquals(10, response.position.x);
+        assertEquals(20, response.position.y);
+        assertEquals(4, response.shelves.size());
+        assertEquals(4, mockRack.getShelves().size());
+
+        verify(rackRepository, times(3)).findById(1);
+        verify(shelfRepository, times(3)).findFirstByRackOrderByPositionDesc(mockRack);
+        verify(shelfRepository, times(3)).save(any(Shelf.class));
+    }
+
+
+    @Test
+    void testCreateShelf_FailureRackNotFound() {
+        when(rackRepository.findById(1)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> rackController.createShelf(1)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("No rack with id 1 was found", exception.getReason());
+
+        verify(rackRepository, times(1)).findById(1);
+        verifyNoInteractions(shelfRepository);
+    }
+
+    @Test
+    void testUpdateRackPosition_FailureRackNotFound() {
+        CreateRackRequest request = new CreateRackRequest();
+        request.xCoordinate = 15;
+        request.yCoordinate = 25;
+
+        when(rackRepository.findById(1)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> rackController.updateRackPosition(1, request)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("No rack with id 1 was found", exception.getReason());
+
+        verify(rackRepository, times(1)).findById(1);
+        verify(rackRepository, never()).save(any(Rack.class));
+    }
+
+    @Test
+    void testDeleteRack_FailureRackNotFound() {
+        when(rackRepository.findById(1)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> rackController.deleteRack(1)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("No rack with id 1 was found", exception.getReason());
+
+        verify(rackRepository, times(1)).findById(1);
+        verify(rackRepository, never()).deleteById(anyInt());
+    }
+
+
+    @Test
+    void testGetAllRacks_EmptyResult() {
+        when(rackRepository.findAll()).thenReturn(List.of());
+
+        List<RacksResponse> racks = rackController.getAllRacks();
+
+        assertNotNull(racks);
+        assertTrue(racks.isEmpty());
+
+        verify(rackRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testDeleteRack_FailureNotEmpty() {
+        Rack rackMock = mock(Rack.class);
+        when(rackMock.isEmpty()).thenReturn(false);
+
+        // Mock rackRepository to return the mockRack
+        when(rackRepository.findById(1)).thenReturn(Optional.of(rackMock));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> rackController.deleteRack(1)
+        );
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        assertEquals("The rack with id '1' contains one or more batches", exception.getReason());
+
+        verify(rackRepository, times(1)).findById(1);
+        verify(rackRepository, never()).deleteById(1);
+    }
+
+
+    @Test
+    void testGetRackById_Success() {
+        Rack mockRack = new Rack(10, 20);
+        mockRack.addShelf(new Shelf(mockRack, 1));
+        mockRack.addShelf(new Shelf(mockRack, 2));
+
+        when(rackRepository.findById(1)).thenReturn(Optional.of(mockRack));
+
+        Optional<Rack> response = rackRepository.findById(1);
+
+        assertNotNull(response);
+        assertEquals(10, response.get().getPosition().getX());
+        assertEquals(20, response.get().getPosition().getY());
+        assertEquals(2, response.get().getShelves().size());
+
+        verify(rackRepository, times(1)).findById(1);
+    }
+
+    @Test
+    void testGetShelvesByRackId_Success() {
+        Rack mockRack = new Rack(10, 20);
+        Shelf shelf1 = new Shelf(mockRack, 1);
+        Shelf shelf2 = new Shelf(mockRack, 2);
+
+        mockRack.addShelf(shelf1);
+        mockRack.addShelf(shelf2);
+
+        when(rackRepository.findAll()).thenReturn(List.of(mockRack));
+
+        RacksResponse response = rackController.getAllRacks().getFirst();
+
+        ArrayList<RacksResponse.ShelfResponse> shelves = response.shelves;
+
+        assertNotNull(shelves);
+        assertEquals(2, shelves.size());
+
+        verify(rackRepository, times(1)).findAll();
+    }
+
+
 
 }
