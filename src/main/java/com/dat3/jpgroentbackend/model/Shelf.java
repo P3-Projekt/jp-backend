@@ -93,7 +93,7 @@ public class Shelf {
      * @return True if it contains atleast one batchLocation
      */
     public boolean containsBatches() {
-        return !getBatchLocations().isEmpty();
+        return !isEmpty();
     }
 
     /**

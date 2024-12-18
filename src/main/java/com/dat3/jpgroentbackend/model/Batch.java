@@ -246,7 +246,7 @@ public class Batch {
                 if (maxOnThisShelf == 0) continue;
 
                 // Sets the score to 10 or 0 depending on if the rack contains batches
-                int score = rack.containsBatches() ? 10 : 0;
+                int score = !rack.isEmpty() ? 10 : 0;
 
                 // Increases score if the plant type has a preferred position and the shelf matches the preferred position
                 if ((shelf.getPosition() == 1 && preferredPosition == PlantType.PreferredPosition.Low) ||
