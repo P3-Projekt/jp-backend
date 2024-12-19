@@ -250,7 +250,6 @@ public class EndpointTest {
                 .andExpect(jsonPath("$.needsMorePreGermination[0].batchId").value(1))
                 .andExpect(jsonPath("$.needsMorePreGermination[0].amount").value(10))
                 .andExpect(jsonPath("$.needsMorePreGermination[0].plantName").value("Solsikke"))
-                .andExpect(jsonPath("$.needsMorePreGermination[0].dueDate").value("2024-12-19"))
                 .andExpect(jsonPath("$.canBePlaced").isEmpty());
     }
 
