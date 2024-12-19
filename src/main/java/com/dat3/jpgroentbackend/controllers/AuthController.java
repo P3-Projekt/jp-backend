@@ -36,7 +36,7 @@ public class AuthController {
         ResponseStatusException loginError = new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid username or password");
         User user = userRepository.findById(authRequest.username).orElseThrow(() -> loginError);
 
-        if(user.isActive() || user.getName().equals(DemoDataConfig.getInitUserName())){
+        if(user.isActive()){
             return authenticationService.authenticate(authRequest.username, authRequest.password);
         } else {
             throw loginError;
