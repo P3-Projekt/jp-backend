@@ -58,7 +58,7 @@ public class RacksResponse {
             public final String plant;
             public final String createdBy;
             public final LocalDate harvestDate;
-            public final NextTaskResponse nextTaskResponse;
+            public final NextTaskResponse nextTask;
 
             /**
              * Constructs a BatchResponse from a Batch object.
@@ -81,10 +81,10 @@ public class RacksResponse {
                 long nextTaskEpoch = nextTask.getDueDate().toEpochDay(); // Get the due date of the next task as an epoch day
 
                 // Calculate the progression of the next task
-                double nextTaskProgression = ((double) nowEpoch - lastCompletionEpoch + 1) / (nextTaskEpoch - lastCompletionEpoch + 1);
+                double nextTaskProgression = ((double) nowEpoch - lastCompletionEpoch + 1) / (nextTaskEpoch - lastCompletionEpoch + 1) * 100;
 
                 // Create the NextTaskResponse object
-                this.nextTaskResponse = new NextTaskResponse(nextTask, nextTaskProgression);
+                this.nextTask = new NextTaskResponse(nextTask, nextTaskProgression);
             }
         }
 

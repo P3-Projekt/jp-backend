@@ -136,9 +136,15 @@ public class Batch {
      */
     public int getAmount(){
 
-
         return this.batchLocations.stream().map(BatchLocation::getBatchAmount).reduce(0, Integer::sum);
     }
+
+    public void removeBatchLocations(){
+        int amount = this.getAmount();
+        this.batchLocations.clear();
+        this.batchLocations.add(new BatchLocation(this, null, amount));
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

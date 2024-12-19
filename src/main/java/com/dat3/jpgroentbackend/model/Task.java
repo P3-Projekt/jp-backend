@@ -54,6 +54,9 @@ public class Task {
     public void complete(User completedBy) {
         this.completedBy = completedBy;
         this.completedAt = LocalDateTime.now();
+        if(this.category == Category.Harvest) {
+            batch.removeBatchLocations();
+        }
     }
 
     /**
