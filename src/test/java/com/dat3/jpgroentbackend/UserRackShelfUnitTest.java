@@ -361,7 +361,4 @@ public class UserRackShelfUnitTest {
 
         verify(rackRepository, times(1)).findAll();
     }
-
-
-
 }

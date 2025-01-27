@@ -1,17 +1,18 @@
 package com.dat3.jpgroentbackend.controllers.dto.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 // This class is used to represent a CreateBatchRequest
 public class CreateBatchRequest {
-    @NotNull // NotNull is used to validate that the value is not null
+    @NotBlank // NotNull is used to validate that the value is not null
     public String plantTypeId; // The id (name) of the plant type
 
-    @NotNull
+    @NotBlank
     public String trayTypeId; // The name of the tray type
 
-    @NotNull
+    @NotBlank
     public String createdByUsername; // The name of the user creating the batch
 
     @NotNull

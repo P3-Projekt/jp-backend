@@ -1,4 +1,4 @@
-package com.dat3.jpgroentbackend;
+package com.dat3.jpgroentbackend.tests.endpoints;
 
 import com.dat3.jpgroentbackend.model.*;
 import com.dat3.jpgroentbackend.model.repositories.UserRepository;

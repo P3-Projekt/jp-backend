@@ -51,6 +51,7 @@ public class RackController{
             summary = "Create new Rack"
     )
     public RackDto createRack(
+            @Valid
             @RequestBody CreateRackRequest request
     ){
         // Create a new rack instance and save it to the database

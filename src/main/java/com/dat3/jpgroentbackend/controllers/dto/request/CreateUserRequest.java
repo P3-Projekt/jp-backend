@@ -11,6 +11,6 @@ public class CreateUserRequest {
     @NotNull
     public User.Role role;
 
-    @NotNull
+    @NotBlank
     public String password;
 }

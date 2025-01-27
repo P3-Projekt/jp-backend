@@ -2,12 +2,14 @@ package com.dat3.jpgroentbackend.controllers.dto.request;
 
 import com.dat3.jpgroentbackend.model.PlantType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 // This class is used to represent a CreatePlantTypeRequest
 public class CreatePlantTypeRequest {
-    @NotNull // NotNull is used to validate that the value is not null
+    @NotBlank // NotNull is used to validate that the value is not null
     public String name;
 
     @NotNull
